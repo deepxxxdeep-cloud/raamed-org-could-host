@@ -18,17 +18,35 @@ export async function GET() {
 export async function PUT(request: Request) {
   try {
     const body = await request.json()
-    const { _id, email, status, finalAmount, reason } = body
+    const { action, _id, email, status, finalAmount, reason, isPrinted } = body
+
+    if (action === 'mark_all_printed') {
+      try {
+        const db = await getDb()
+        await db.collection('quotes').updateMany({}, { $set: { isPrinted: true, printedAt: new Date() } })
+        return NextResponse.json({ ok: true, message: 'All leads marked as printed.' })
+      } catch {
+        memoryQuotes.forEach((q: Record<string, unknown>) => {
+          q.isPrinted = true
+          q.printedAt = new Date().toISOString()
+        })
+        return NextResponse.json({ ok: true, message: 'All leads marked as printed.' })
+      }
+    }
 
     if (!_id && !email) {
       return NextResponse.json({ error: 'Missing quote identifier' }, { status: 400 })
     }
 
-    const updateFields = {
-      status: String(status || 'Pending'),
-      finalAmount: String(finalAmount || ''),
-      reason: String(reason || ''),
+    const updateFields: Record<string, unknown> = {
       updatedAt: new Date(),
+    }
+    if (status !== undefined) updateFields.status = String(status || 'Pending')
+    if (finalAmount !== undefined) updateFields.finalAmount = String(finalAmount || '')
+    if (reason !== undefined) updateFields.reason = String(reason || '')
+    if (isPrinted !== undefined) {
+      updateFields.isPrinted = Boolean(isPrinted)
+      if (isPrinted) updateFields.printedAt = new Date()
     }
 
     try {

@@ -28,6 +28,8 @@ export type Quote = {
   status: 'New' | 'Contacted' | 'Converted' | 'Finalized' | 'Not Finalized' | 'Pending'
   finalAmount?: string
   reason?: string
+  isPrinted?: boolean
+  printedAt?: Date | string
 }
 
 export async function createQuote(input: Omit<Quote, 'createdAt' | 'status'>) {
