@@ -1,12 +1,14 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { usePathname } from 'next/navigation'
 import { Check, Globe } from 'lucide-react'
 import { LANGUAGES, type Language, useLanguage } from '@/lib/language-context'
 
 export function LanguageSwitcher() {
   const { language, setLanguage, t } = useLanguage()
   const [open, setOpen] = useState(false)
+  const pathname = usePathname()
   const currentOption = LANGUAGES.find((l) => l.code === language) || LANGUAGES[0]
 
   const triggerFullPageTranslation = (targetLang: string) => {
@@ -46,6 +48,15 @@ export function LanguageSwitcher() {
       }
     }
   }, [])
+
+  useEffect(() => {
+    if (language && language !== 'en') {
+      const timer = setTimeout(() => {
+        triggerFullPageTranslation(language)
+      }, 300)
+      return () => clearTimeout(timer)
+    }
+  }, [pathname, language])
 
   return (
     <div className="relative inline-block text-left">

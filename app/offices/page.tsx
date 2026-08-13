@@ -1,51 +1,51 @@
+'use client'
+
 import { Building2, ExternalLink, MapPin, Phone } from 'lucide-react'
 import { SiteFooter, SiteHeader, SectionIntro } from '@/components/site-shell'
-
-export const metadata = {
-  title: 'Branch Network & Locations | Raamed Medical Equipment',
-  description: 'Find Raamed branches across India. Main Branch in Delhi (Laxmi Nagar), with branches in Patna (Bihar) and Lucknow (UP).',
-}
-
-export const regionalOffices = [
-  {
-    city: 'Delhi (NCR)',
-    state: 'Delhi',
-    label: 'Main Branch (Headquarters)',
-    isMain: true,
-    address: 'DDA BUILDING, LAXMI NAGAR COMMERCIAL COMPLEX, DELHI 110092',
-    phone: '011-36650267',
-    mobile: '+91 96259 70722',
-    mapUrl: 'https://www.google.com/maps/search/?api=1&query=DDA+BUILDING+LAXMI+NAGAR+COMMERCIAL+COMPLEX+DELHI+110092',
-  },
-  {
-    city: 'Patna',
-    state: 'Bihar',
-    label: 'Patna Branch',
-    isMain: false,
-    address: 'Ground Floor, Gokul Nagar, Patna, Bihar',
-    mobile: '+91 96259 70722',
-    mapUrl: 'https://www.google.com/maps/search/?api=1&query=Ground+Floor+Gokul+Nagar+Patna+Bihar',
-  },
-  {
-    city: 'Lucknow',
-    state: 'Uttar Pradesh',
-    label: 'Lucknow Branch',
-    isMain: false,
-    address: 'Near KGMC, Chowk, Lucknow-226003, Uttar Pradesh',
-    mobile: '+91 96259 70722',
-    mapUrl: 'https://www.google.com/maps/search/?api=1&query=Near+KGMC+Chowk+Lucknow+226003',
-  },
-]
+import { useLanguage } from '@/lib/language-context'
 
 export default function OfficesPage() {
+  const { t } = useLanguage()
+
+  const regionalOffices = [
+    {
+      city: 'Delhi (NCR)',
+      state: 'Delhi',
+      label: t('mainBranchHq'),
+      isMain: true,
+      address: 'DDA BUILDING, LAXMI NAGAR COMMERCIAL COMPLEX, DELHI 110092',
+      phone: '011-36650267',
+      mobile: '+91 96259 70722',
+      mapUrl: 'https://www.google.com/maps/search/?api=1&query=DDA+BUILDING+LAXMI+NAGAR+COMMERCIAL+COMPLEX+DELHI+110092',
+    },
+    {
+      city: 'Patna',
+      state: 'Bihar',
+      label: t('patnaBranch'),
+      isMain: false,
+      address: 'Ground Floor, Gokul Nagar, Patna, Bihar',
+      mobile: '+91 96259 70722',
+      mapUrl: 'https://www.google.com/maps/search/?api=1&query=Ground+Floor+Gokul+Nagar+Patna+Bihar',
+    },
+    {
+      city: 'Lucknow',
+      state: 'Uttar Pradesh',
+      label: t('lucknowBranch'),
+      isMain: false,
+      address: 'Near KGMC, Chowk, Lucknow-226003, Uttar Pradesh',
+      mobile: '+91 96259 70722',
+      mapUrl: 'https://www.google.com/maps/search/?api=1&query=Near+KGMC+Chowk+Lucknow+226003',
+    },
+  ]
+
   return (
     <main className="bg-[#f7fafb] text-[#102a43]">
       <SiteHeader />
       <section className="mx-auto max-w-7xl px-5 py-20 lg:px-8">
         <SectionIntro
-          eyebrow="Branch Network & Offices"
-          title="Headquartered in Delhi, serving healthcare teams across India."
-          text="Our Main Branch in Delhi and dedicated regional branches in Patna and Lucknow connect hospitals and clinics with rapid equipment delivery and responsive clinical support."
+          eyebrow={t('branchNetworkEyebrow')}
+          title={t('branchNetworkTitle')}
+          text={t('branchNetworkSubtitle')}
         />
 
         <div className="mt-14 grid gap-6 md:grid-cols-3">
@@ -94,7 +94,7 @@ export default function OfficesPage() {
                       className="inline-flex items-center gap-2 font-semibold text-[#102a43] hover:text-[#f36f2b]"
                     >
                       <Phone className="size-4 text-[#f36f2b]" />
-                      {office.phone} (Landline HQ)
+                      {office.phone} {t('landlineHq')}
                     </a>
                   )}
                   {office.mobile && (
@@ -103,7 +103,7 @@ export default function OfficesPage() {
                       className="inline-flex items-center gap-2 font-semibold text-[#102a43] hover:text-[#f36f2b]"
                     >
                       <Phone className="size-4 text-[#49a878]" />
-                      {office.mobile} (Mobile / WhatsApp)
+                      {office.mobile} {t('mobileWhatsapp')}
                     </a>
                   )}
                 </div>
@@ -115,7 +115,7 @@ export default function OfficesPage() {
                   className="mt-2 inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-[#0c6670] px-4 py-3 text-sm font-bold text-white transition hover:bg-[#094d54]"
                 >
                   <MapPin className="size-4 text-orange-300" />
-                  Open in Google Maps
+                  {t('openInGoogleMaps')}
                   <ExternalLink className="size-3.5 opacity-80" />
                 </a>
               </div>
@@ -124,15 +124,15 @@ export default function OfficesPage() {
         </div>
 
         <div className="mt-12 rounded-3xl bg-[#102a43] p-8 text-white sm:p-10">
-          <p className="text-sm font-bold uppercase tracking-[.16em] text-orange-300">Need direct assistance?</p>
-          <h2 className="mt-3 text-3xl font-semibold">Connect directly with our Main Branch or regional representatives.</h2>
-          <p className="mt-2 max-w-xl text-sm leading-6 text-slate-300">We provide quick turnaround for clinical enquiries, product demos, and technical maintenance across Delhi, Bihar, and Uttar Pradesh.</p>
+          <p className="text-sm font-bold uppercase tracking-[.16em] text-orange-300">{t('needDirectAssistance')}</p>
+          <h2 className="mt-3 text-3xl font-semibold">{t('connectDirectly')}</h2>
+          <p className="mt-2 max-w-xl text-sm leading-6 text-slate-300">{t('quickTurnaroundText')}</p>
           <div className="mt-6 flex flex-wrap gap-4">
             <a href="tel:01136650267" className="rounded-full bg-[#f36f2b] px-6 py-3 font-bold text-white transition hover:bg-[#dd5b1d]">
-              Call Delhi HQ: 011-36650267
+              {t('callDelhiHqBtn')}
             </a>
             <a href="mailto:Business@raamed.online" className="rounded-full border border-white/20 bg-white/10 px-6 py-3 font-bold text-white transition hover:bg-white/20">
-              Email: Business@raamed.online
+              {t('emailBtn')}
             </a>
           </div>
         </div>

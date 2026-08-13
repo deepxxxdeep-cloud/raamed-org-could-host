@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { ArrowRight, Search, SlidersHorizontal } from 'lucide-react'
 import { QuoteDialog } from '@/components/quote-dialog'
 import { MediaCard, SiteFooter, SiteHeader } from '@/components/site-shell'
+import { useLanguage } from '@/lib/language-context'
 
 type CatalogItem = {
   name: string
@@ -15,6 +16,7 @@ type CatalogItem = {
 
 
 function ProductCard({ item, onQuote }: { item: CatalogItem; onQuote: () => void }) {
+  const { t } = useLanguage()
   const imagesList = item.images && item.images.length > 0 ? item.images : (item.image ? [item.image] : [])
   const [activeIdx, setActiveIdx] = useState(0)
   const currentImage = imagesList[activeIdx] || item.image || '/raamed-logo.jpg'
@@ -64,7 +66,7 @@ function ProductCard({ item, onQuote }: { item: CatalogItem; onQuote: () => void
           onClick={onQuote}
           className="mt-2 inline-flex items-center gap-1 font-bold text-[#0c6670] transition hover:text-[#f36f2b]"
         >
-          Discuss this range <ArrowRight className="size-4" />
+          {t('discussThisRange')} <ArrowRight className="size-4" />
         </button>
       </div>
     </article>
@@ -72,6 +74,7 @@ function ProductCard({ item, onQuote }: { item: CatalogItem; onQuote: () => void
 }
 
 export default function ProductsPage() {
+  const { t } = useLanguage()
   const [quoteOpen, setQuoteOpen] = useState(false)
   const [liveCatalog, setLiveCatalog] = useState<CatalogItem[]>([])
 
@@ -93,12 +96,12 @@ export default function ProductsPage() {
       <SiteHeader onQuote={() => setQuoteOpen(true)} />
 
       <section className="mx-auto max-w-7xl px-5 pb-10 pt-16 lg:px-8">
-        <p className="text-sm font-bold uppercase tracking-[.18em] text-[#f36f2b]">Equipment catalogue</p>
+        <p className="text-sm font-bold uppercase tracking-[.18em] text-[#f36f2b]">{t('catalogueEyebrow')}</p>
         <h1 className="mt-3 max-w-3xl text-balance text-5xl font-semibold tracking-[-.06em] sm:text-6xl">
-          Equipment selected for real clinical work.
+          {t('catalogueTitle')}
         </h1>
         <p className="mt-5 max-w-2xl text-lg leading-8 text-slate-600">
-          Explore Raamed&apos;s equipment categories. Tell us what your team is planning and we&apos;ll help you find the right fit.
+          {t('catalogueSubtitle')}
         </p>
       </section>
 
@@ -113,12 +116,12 @@ export default function ProductsPage() {
                 filter === category ? 'bg-[#102a43] text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
               }`}
             >
-              {category}
+              {category === 'All equipment' ? t('allEquipment') : category}
             </button>
           ))}
           <div className="ml-auto hidden items-center gap-2 pr-3 text-sm text-slate-400 md:flex">
             <Search className="size-4" />
-            Browse by category
+            {t('browseByCategory')}
           </div>
         </div>
 
