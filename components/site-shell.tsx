@@ -8,7 +8,7 @@ export const logoUrl = 'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/
 
 export function SiteHeader({ onQuote }: { onQuote?: () => void }) {
   const [open, setOpen] = useState(false)
-  const links = [['About us', '/about'], ['Regional offices', '/offices'], ['Customers', '/customers']]
+  const links = [['About us', '/about'], ['Branch network', '/offices'], ['Customers', '/customers']]
   const productLinks = [['Patient monitoring', '/products#monitoring'], ['Surgical systems', '/products#surgical'], ['Endoscopy systems', '/products#diagnostics'], ['Respiratory care', '/products#critical-care'], ['Sterilization & reprocessing', '/products#care-systems']]
   return <header className="sticky top-0 z-40 overflow-visible border-b border-slate-200/80 bg-white/95 backdrop-blur-xl">
     <div className="mx-auto flex max-w-7xl items-center gap-6 px-5 py-3 lg:px-8">
@@ -24,7 +24,7 @@ export function SiteHeader({ onQuote }: { onQuote?: () => void }) {
 }
 
 export function SiteFooter() {
-  return <footer className="bg-[#102a43] px-5 py-14 text-white lg:px-8"><div className="mx-auto grid max-w-7xl gap-10 md:grid-cols-[1.3fr_1fr_1fr]"><div><img src={logoUrl} alt="Raamed logo - RAAMED / RAMMED Medical Equipment" className="h-16 w-56 rounded-xl bg-white object-contain p-1" /><p className="mt-5 max-w-sm text-sm leading-7 text-slate-300">Raamed (RAAMED / RAMMED) – Reliable medical equipment, practical expertise, and responsive support for hospitals, clinics, and healthcare teams across India.</p></div><div><p className="font-bold text-orange-300">Explore Raamed</p><div className="mt-4 flex flex-col gap-3 text-sm text-slate-300"><Link href="/about">About us</Link><Link href="/offices">Regional offices</Link><Link href="/customers">Customers</Link><Link href="/products">Products & Equipment</Link><Link href="/media">Media centre</Link></div></div><div><p className="font-bold text-orange-300">Talk to our team</p><div className="mt-4 flex flex-col gap-3 text-sm text-slate-300"><a href="tel:+919625970722">+91 96259 70722</a><a href="mailto:Business@raamed.online">Business@raamed.online</a><p>Mon–Sat, 9:00–18:00 IST</p></div></div></div><div className="mx-auto mt-12 max-w-7xl border-t border-white/15 pt-5 text-xs text-slate-400"><span>© 2026 Raamed (RAAMED / RAMMED). Built for dependable medical care. All rights reserved.</span><span className="mt-2 block text-[11px] text-slate-500">Made by <a href="https://aiwebify.site" target="_blank" rel="noreferrer" className="underline underline-offset-2 transition hover:text-orange-300">aiwebify.site</a></span></div></footer>
+  return <footer className="bg-[#102a43] px-5 py-14 text-white lg:px-8"><div className="mx-auto grid max-w-7xl gap-10 md:grid-cols-[1.3fr_1fr_1fr]"><div><img src={logoUrl} alt="Raamed logo - RAAMED / RAMMED Medical Equipment" className="h-16 w-56 rounded-xl bg-white object-contain p-1" /><p className="mt-5 max-w-sm text-sm leading-7 text-slate-300">Raamed (RAAMED / RAMMED) – Reliable medical equipment, practical expertise, and responsive support for hospitals, clinics, and healthcare teams across India.</p></div><div><p className="font-bold text-orange-300">Explore Raamed</p><div className="mt-4 flex flex-col gap-3 text-sm text-slate-300"><Link href="/about">About us</Link><Link href="/offices">Branch network</Link><Link href="/customers">Customers</Link><Link href="/products">Products & Equipment</Link><Link href="/media">Media centre</Link></div></div><div><p className="font-bold text-orange-300">Talk to our team</p><div className="mt-4 flex flex-col gap-3 text-sm text-slate-300"><a href="tel:01136650267">011-36650267 (Delhi HQ)</a><a href="tel:+919625970722">+91 96259 70722</a><a href="mailto:Business@raamed.online">Business@raamed.online</a><p>Mon–Sat, 9:00–18:00 IST</p></div></div></div><div className="mx-auto mt-12 max-w-7xl border-t border-white/15 pt-5 text-xs text-slate-400"><span>© 2026 Raamed (RAAMED / RAMMED). Built for dependable medical care. All rights reserved.</span><span className="mt-2 block text-[11px] text-slate-500">Made by <a href="https://aiwebify.site" target="_blank" rel="noreferrer" className="underline underline-offset-2 transition hover:text-orange-300">aiwebify.site</a></span></div></footer>
 }
 
 export function SectionIntro({ eyebrow, title, text }: { eyebrow: string; title: string; text: string }) {
@@ -36,10 +36,34 @@ export function MediaCard({ title, type, tone = 'bg-[#d9f2ef]' }: { title: strin
 }
 
 export const regionalOffices = [
-  { city: 'New Delhi', label: 'Head office', address: 'B-18, Okhla Industrial Area, New Delhi 110020', phone: '+91 96259 70722' },
-  { city: 'Mumbai', label: 'West region', address: 'Andheri East, Mumbai 400069', phone: '+91 22 4100 0000' },
-  { city: 'Bengaluru', label: 'South region', address: 'Indiranagar, Bengaluru 560038', phone: '+91 80 4500 0000' },
-  { city: 'Kolkata', label: 'East region', address: 'Salt Lake, Kolkata 700091', phone: '+91 33 4600 0000' },
+  {
+    city: 'Delhi (NCR)',
+    state: 'Delhi',
+    label: 'Main Branch (Headquarters)',
+    isMain: true,
+    address: 'DDA BUILDING, LAXMI NAGAR COMMERCIAL COMPLEX, DELHI 110092',
+    phone: '011-36650267',
+    mobile: '+91 96259 70722',
+    mapUrl: 'https://www.google.com/maps/search/?api=1&query=DDA+BUILDING+LAXMI+NAGAR+COMMERCIAL+COMPLEX+DELHI+110092',
+  },
+  {
+    city: 'Patna',
+    state: 'Bihar',
+    label: 'Patna Branch',
+    isMain: false,
+    address: 'Ground Floor, Gokul Nagar, Patna, Bihar',
+    phone: '+91 96259 70722',
+    mapUrl: 'https://www.google.com/maps/search/?api=1&query=Ground+Floor+Gokul+Nagar+Patna+Bihar',
+  },
+  {
+    city: 'Lucknow',
+    state: 'Uttar Pradesh',
+    label: 'Lucknow Branch',
+    isMain: false,
+    address: 'Near KGMC, Chowk, Lucknow-226003, Uttar Pradesh',
+    phone: '+91 96259 70722',
+    mapUrl: 'https://www.google.com/maps/search/?api=1&query=Near+KGMC+Chowk+Lucknow+226003',
+  },
 ]
 
 export const reviews = [
