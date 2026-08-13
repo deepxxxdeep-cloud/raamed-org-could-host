@@ -3,9 +3,27 @@ import { ObjectId } from 'mongodb'
 import { getDb } from '@/lib/mongodb'
 
 const defaults = [
-  { name: 'Portable Patient Monitor', category: 'Monitoring', description: 'Compact multi-parameter monitor for confident bedside care.', image: 'https://images.unsplash.com/photo-1584982751601-97dcc096659c?auto=format&fit=crop&w=900&q=85' },
-  { name: 'LED Surgical Light', category: 'Surgical', description: 'Shadowless illumination with precise, cool LED output.', image: 'https://images.unsplash.com/photo-1516841273335-e39b37888115?auto=format&fit=crop&w=900&q=85' },
-  { name: 'Endoscope X-200', category: 'Diagnostics', description: 'High-definition visualization for modern diagnostic teams.', image: 'https://images.unsplash.com/photo-1579684385127-1ef15d508118?auto=format&fit=crop&w=900&q=85' },
+  {
+    name: 'Portable Patient Monitor',
+    category: 'Monitoring',
+    description: 'Compact multi-parameter monitor for confident bedside care.',
+    image: 'https://images.unsplash.com/photo-1584982751601-97dcc096659c?auto=format&fit=crop&w=900&q=85',
+    images: ['https://images.unsplash.com/photo-1584982751601-97dcc096659c?auto=format&fit=crop&w=900&q=85'],
+  },
+  {
+    name: 'LED Surgical Light',
+    category: 'Surgical',
+    description: 'Shadowless illumination with precise, cool LED output.',
+    image: 'https://images.unsplash.com/photo-1516841273335-e39b37888115?auto=format&fit=crop&w=900&q=85',
+    images: ['https://images.unsplash.com/photo-1516841273335-e39b37888115?auto=format&fit=crop&w=900&q=85'],
+  },
+  {
+    name: 'Endoscope X-200',
+    category: 'Diagnostics',
+    description: 'High-definition visualization for modern diagnostic teams.',
+    image: 'https://images.unsplash.com/photo-1579684385127-1ef15d508118?auto=format&fit=crop&w=900&q=85',
+    images: ['https://images.unsplash.com/photo-1579684385127-1ef15d508118?auto=format&fit=crop&w=900&q=85'],
+  },
 ]
 
 export async function GET() {
@@ -37,19 +55,36 @@ export async function GET() {
 export async function POST(request: Request) {
   try {
     const body = await request.json()
-    if (!body.name || !body.category || !body.description || !body.image) {
-      return NextResponse.json({ error: 'Name, category, description and image are required' }, { status: 400 })
+    const images = Array.isArray(body.images) && body.images.length > 0
+      ? body.images.map(String)
+      : (body.image ? [String(body.image)] : [])
+
+    if (!body.name || !body.category || !body.description || images.length === 0) {
+      return NextResponse.json(
+        { error: 'Name, category, description, and at least 1 image (max 5) are required' },
+        { status: 400 }
+      )
     }
+
+    const primaryImage = images[0]
     const db = await getDb()
     const result = await db.collection('products').insertOne({
       name: String(body.name),
       category: String(body.category),
       description: String(body.description),
-      image: String(body.image),
+      image: primaryImage,
+      images: images.slice(0, 5),
       clicks: 0,
       createdAt: new Date(),
     })
-    return NextResponse.json({ _id: result.insertedId, ...body })
+    return NextResponse.json({
+      _id: result.insertedId,
+      name: body.name,
+      category: body.category,
+      description: body.description,
+      image: primaryImage,
+      images: images.slice(0, 5),
+    })
   } catch (err: unknown) {
     const errorMsg = err instanceof Error ? err.message : 'Database error'
     return NextResponse.json({ error: errorMsg }, { status: 500 })
