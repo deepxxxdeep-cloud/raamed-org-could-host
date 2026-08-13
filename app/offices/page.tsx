@@ -1,0 +1,11 @@
+import { MapPin, Phone } from 'lucide-react'
+import { SiteFooter, SiteHeader, SectionIntro } from '@/components/site-shell'
+
+const regionalOffices = [
+  { city: 'New Delhi', label: 'Head office', address: 'B-18, Okhla Industrial Area, New Delhi 110020', phone: '+91 11 4000 0000' },
+  { city: 'Mumbai', label: 'West region', address: 'Andheri East, Mumbai 400069', phone: '+91 22 4100 0000' },
+  { city: 'Bengaluru', label: 'South region', address: 'Indiranagar, Bengaluru 560038', phone: '+91 80 4500 0000' },
+  { city: 'Kolkata', label: 'East region', address: 'Salt Lake, Kolkata 700091', phone: '+91 33 4600 0000' },
+]
+
+export default function OfficesPage() { return <main className="bg-[#f7fafb] text-[#102a43]"><SiteHeader /><section className="mx-auto max-w-7xl px-5 py-20 lg:px-8"><SectionIntro eyebrow="Regional offices" title="Close to the teams doing the work." text="Our regional teams help hospitals and clinics move from requirements to reliable installation with less friction." /><div className="mt-14 grid gap-5 sm:grid-cols-2">{regionalOffices.map((office, index) => <article key={office.city} className="group rounded-3xl border border-slate-200 bg-white p-7 shadow-sm transition hover:-translate-y-1 hover:shadow-xl"><div className="flex items-start justify-between"><span className={`grid size-12 place-items-center rounded-2xl ${index % 2 ? 'bg-[#e8eef8]' : 'bg-[#d9f2ef]'} text-[#0c6670]`}><MapPin /></span><span className="text-xs font-bold uppercase tracking-[.16em] text-[#f36f2b]">{office.label}</span></div><h2 className="mt-7 text-2xl font-semibold">{office.city}</h2><p className="mt-3 max-w-sm leading-7 text-slate-600">{office.address}</p><a href={`tel:${office.phone.replaceAll(' ', '')}`} className="mt-6 inline-flex items-center gap-2 font-semibold text-[#0c6670]"><Phone className="size-4" />{office.phone}</a></article>)}</div><div className="mt-10 rounded-3xl bg-[#102a43] p-8 text-white sm:p-10"><p className="text-sm font-bold uppercase tracking-[.16em] text-orange-300">Need a local answer?</p><h2 className="mt-3 text-3xl font-semibold">Our team can route your request to the right specialist.</h2><a href="mailto:care@thraamed.com" className="mt-6 inline-block rounded-full bg-[#f36f2b] px-6 py-3 font-bold">Contact regional support</a></div></section><SiteFooter /></main> }

@@ -1,0 +1,25 @@
+'use client'
+
+import { useEffect, useState } from 'react'
+import { ArrowRight, Search, SlidersHorizontal } from 'lucide-react'
+import { QuoteDialog } from '@/components/quote-dialog'
+import { MediaCard, SiteFooter, SiteHeader } from '@/components/site-shell'
+
+const catalog = [
+  { name: 'Patient Monitoring', category: 'Monitoring', description: 'Bedside and transport monitoring systems for clear, continuous visibility.', image: 'https://images.unsplash.com/photo-1584982751601-97dcc096659c?auto=format&fit=crop&w=1000&q=85' },
+  { name: 'Surgical Visualization', category: 'Surgical', description: 'Operating room visualization and illumination for precise clinical work.', image: 'https://images.unsplash.com/photo-1516841273335-e39b37888115?auto=format&fit=crop&w=1000&q=85' },
+  { name: 'Endoscopy Systems', category: 'Diagnostics', description: 'High-definition diagnostic systems designed for modern clinical teams.', image: 'https://images.unsplash.com/photo-1579684385127-1ef15d508118?auto=format&fit=crop&w=1000&q=85' },
+  { name: 'Electrosurgical Systems', category: 'Surgical', description: 'Reliable energy platforms with intuitive control for procedure rooms.', image: 'https://images.unsplash.com/photo-1559757175-0eb30cd8c063?auto=format&fit=crop&w=1000&q=85' },
+  { name: 'Respiratory Care', category: 'Critical care', description: 'Equipment for respiratory support, recovery, and monitored care.', image: 'https://images.unsplash.com/photo-1583911860205-72f8ac8ddcbe?auto=format&fit=crop&w=1000&q=85' },
+  { name: 'Sterilization & Reprocessing', category: 'Care systems', description: 'Practical reprocessing support for safe, repeatable clinical workflows.', image: 'https://images.unsplash.com/photo-1584362917165-526a968579e8?auto=format&fit=crop&w=1000&q=85' },
+]
+
+export default function ProductsPage() {
+  const [quoteOpen, setQuoteOpen] = useState(false)
+  const [liveCatalog, setLiveCatalog] = useState(catalog)
+  useEffect(() => { fetch('/api/products').then((response) => response.ok ? response.json() : []).then((items) => { if (Array.isArray(items) && items.length) setLiveCatalog(items) }).catch(() => undefined) }, [])
+  const [filter, setFilter] = useState('All equipment')
+  const categories = ['All equipment', ...Array.from(new Set(liveCatalog.map((item) => item.category)))]
+  const items = filter === 'All equipment' ? liveCatalog : liveCatalog.filter((item) => item.category === filter)
+  return <main className="min-h-screen bg-[#f7fafb] text-[#102a43]"><SiteHeader onQuote={() => setQuoteOpen(true)} /><section className="mx-auto max-w-7xl px-5 pb-10 pt-16 lg:px-8"><p className="text-sm font-bold uppercase tracking-[.18em] text-[#f36f2b]">Equipment catalogue</p><h1 className="mt-3 max-w-3xl text-balance text-5xl font-semibold tracking-[-.06em] sm:text-6xl">Equipment selected for real clinical work.</h1><p className="mt-5 max-w-2xl text-lg leading-8 text-slate-600">Explore Raamed&apos;s equipment categories. Tell us what your team is planning and we&apos;ll help you find the right fit.</p></section><section className="mx-auto max-w-7xl px-5 pb-20 lg:px-8"><div className="mb-8 flex flex-wrap items-center gap-3 rounded-2xl border border-slate-200 bg-white p-3 shadow-sm"><SlidersHorizontal className="ml-2 size-4 text-[#f36f2b]" />{categories.map((category) => <button key={category} onClick={() => setFilter(category)} className={`rounded-full px-4 py-2 text-sm font-semibold transition ${filter === category ? 'bg-[#102a43] text-white' : 'text-slate-600 hover:bg-orange-50 hover:text-[#f36f2b]'}`}>{category}</button>)}<div className="ml-auto hidden items-center gap-2 pr-3 text-sm text-slate-400 md:flex"><Search className="size-4" />Browse by category</div></div><div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">{items.map((item) => <article key={item.name} className="group overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-xl"><img src={item.image} alt={item.name} className="h-52 w-full object-cover transition duration-500 group-hover:scale-105" /><div className="p-6"><p className="text-xs font-bold uppercase tracking-[.14em] text-[#f36f2b]">{item.category}</p><h2 className="mt-3 text-2xl font-semibold">{item.name}</h2><p className="mt-3 text-sm leading-6 text-slate-600">{item.description}</p><button onClick={() => setQuoteOpen(true)} className="mt-6 font-bold text-[#0c6670]">Discuss this range <ArrowRight className="ml-1 inline size-4" /></button></div></article>)}</div></section><section className="mx-auto max-w-7xl px-5 pb-20 lg:px-8"><div className="grid gap-6 md:grid-cols-3"><MediaCard title="Equipment in practice" type="Photo gallery" /><MediaCard title="How our systems work" type="Video library" tone="bg-[#fff0e8]" /><MediaCard title="Clinical support, clearly" type="Case studies" tone="bg-[#e9eef8]" /></div></section><SiteFooter /><QuoteDialog open={quoteOpen} onOpenChange={setQuoteOpen} /></main>
+}
