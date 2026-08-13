@@ -144,6 +144,8 @@ const jsonLd = {
   ],
 }
 
+import { LanguageProvider } from '@/lib/language-context'
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -158,7 +160,9 @@ export default function RootLayout({
         />
       </head>
       <body className="antialiased">
-        {children}
+        <LanguageProvider>
+          {children}
+        </LanguageProvider>
         {process.env.NODE_ENV === 'production' && <Analytics />}
       </body>
     </html>

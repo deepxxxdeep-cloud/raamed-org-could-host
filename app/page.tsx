@@ -7,6 +7,8 @@ import { MedicalHero } from '@/components/medical-hero'
 import { MediaCard, SiteFooter, SiteHeader } from '@/components/site-shell'
 import { QuoteDialog } from '@/components/quote-dialog'
 
+import { useLanguage } from '@/lib/language-context'
+
 type ProductItem = {
   _id?: string
   name: string
@@ -16,10 +18,10 @@ type ProductItem = {
   images?: string[]
 }
 
-
 const whatsappNumber = '919625970722'
 
 export default function Page() {
+  const { t } = useLanguage()
   const [quoteOpen, setQuoteOpen] = useState(false)
   const [liveProducts, setLiveProducts] = useState<ProductItem[]>([])
   const [loaded, setLoaded] = useState(false)
@@ -43,25 +45,25 @@ export default function Page() {
       <section className="mx-auto grid max-w-7xl gap-10 px-5 pb-20 pt-14 lg:grid-cols-[.9fr_1.1fr] lg:items-center lg:px-8 lg:pt-20">
         <div>
           <p className="flex items-center gap-2 text-sm font-bold uppercase tracking-[.18em] text-[#f36f2b]">
-            <span className="size-2 rounded-full bg-[#49a878]" /> Trusted clinical partners
+            <span className="size-2 rounded-full bg-[#49a878]" /> {t('trustedPartners')}
           </p>
           <h1 className="mt-5 max-w-2xl text-balance text-5xl font-semibold leading-[1.02] tracking-[-.06em] sm:text-7xl">
-            The dependable standard for medical care.
+            {t('heroTitle')}
           </h1>
           <p className="mt-6 max-w-xl text-lg leading-8 text-slate-600">
-            We help hospitals, clinics, and care teams make confident equipment decisions—with practical expertise, responsive support, and technology that performs.
+            {t('heroSubtitle')}
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
             <Link href="#products" className="rounded-full bg-[#f36f2b] px-6 py-3.5 font-bold text-white shadow-lg shadow-orange-500/15 transition hover:-translate-y-0.5 hover:bg-[#dd5b1d]">
-              Explore equipment <ArrowRight className="ml-2 inline size-4" />
+              {t('exploreEquipment')} <ArrowRight className="ml-2 inline size-4" />
             </Link>
             <button onClick={() => setQuoteOpen(true)} className="rounded-full border border-slate-300 bg-white px-6 py-3.5 font-bold text-[#0c6670] transition hover:-translate-y-0.5 hover:border-[#f36f2b]">
-              Request a quote
+              {t('requestQuote')}
             </button>
           </div>
           <div className="mt-9 flex flex-wrap gap-6 text-sm font-semibold text-slate-600">
-            <span><ShieldCheck className="mr-2 inline size-4 text-[#49a878]" />Quality checked</span>
-            <span><CheckCircle2 className="mr-2 inline size-4 text-[#49a878]" />Regional support</span>
+            <span><ShieldCheck className="mr-2 inline size-4 text-[#49a878]" />{t('qualityChecked')}</span>
+            <span><CheckCircle2 className="mr-2 inline size-4 text-[#49a878]" />{t('regionalSupport')}</span>
           </div>
         </div>
         <MedicalHero />
