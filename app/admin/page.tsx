@@ -29,29 +29,6 @@ type Metrics = {
   products: { name: string; clicks: number }[]
 }
 
-const demoProducts: Product[] = [
-  {
-    name: 'Portable Patient Monitor',
-    category: 'Monitoring',
-    description: 'Compact multi-parameter monitor for confident bedside care.',
-    image: 'https://images.unsplash.com/photo-1584982751601-97dcc096659c?auto=format&fit=crop&w=900&q=85',
-    images: ['https://images.unsplash.com/photo-1584982751601-97dcc096659c?auto=format&fit=crop&w=900&q=85'],
-  },
-  {
-    name: 'LED Surgical Light',
-    category: 'Surgical',
-    description: 'Shadowless illumination with precise, cool LED output.',
-    image: 'https://images.unsplash.com/photo-1516841273335-e39b37888115?auto=format&fit=crop&w=900&q=85',
-    images: ['https://images.unsplash.com/photo-1516841273335-e39b37888115?auto=format&fit=crop&w=900&q=85'],
-  },
-  {
-    name: 'Endoscope X-200',
-    category: 'Diagnostics',
-    description: 'High-definition visualization for modern diagnostic teams.',
-    image: 'https://images.unsplash.com/photo-1579684385127-1ef15d508118?auto=format&fit=crop&w=900&q=85',
-    images: ['https://images.unsplash.com/photo-1579684385127-1ef15d508118?auto=format&fit=crop&w=900&q=85'],
-  },
-]
 
 export default function AdminPage() {
   const [active, setActive] = useState('Overview')
@@ -98,11 +75,11 @@ export default function AdminPage() {
   }, [])
 
   const categories = useMemo(
-    () => Array.from(new Set([...demoProducts.map((p) => p.category), ...products.map((p) => p.category)])),
+    () => Array.from(new Set(products.map((p) => p.category))),
     [products]
   )
 
-  const allProducts = loaded ? products : demoProducts
+  const allProducts = products
 
   async function upload(file: File) {
     const data = new FormData()

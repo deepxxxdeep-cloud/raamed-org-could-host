@@ -13,14 +13,6 @@ type CatalogItem = {
   images?: string[]
 }
 
-const catalog: CatalogItem[] = [
-  { name: 'Patient Monitoring', category: 'Monitoring', description: 'Bedside and transport monitoring systems for clear, continuous visibility.', image: 'https://images.unsplash.com/photo-1584982751601-97dcc096659c?auto=format&fit=crop&w=1000&q=85', images: ['https://images.unsplash.com/photo-1584982751601-97dcc096659c?auto=format&fit=crop&w=1000&q=85'] },
-  { name: 'Surgical Visualization', category: 'Surgical', description: 'Operating room visualization and illumination for precise clinical work.', image: 'https://images.unsplash.com/photo-1516841273335-e39b37888115?auto=format&fit=crop&w=1000&q=85', images: ['https://images.unsplash.com/photo-1516841273335-e39b37888115?auto=format&fit=crop&w=1000&q=85'] },
-  { name: 'Endoscopy Systems', category: 'Diagnostics', description: 'High-definition diagnostic systems designed for modern clinical teams.', image: 'https://images.unsplash.com/photo-1579684385127-1ef15d508118?auto=format&fit=crop&w=1000&q=85', images: ['https://images.unsplash.com/photo-1579684385127-1ef15d508118?auto=format&fit=crop&w=1000&q=85'] },
-  { name: 'Electrosurgical Systems', category: 'Surgical', description: 'Reliable energy platforms with intuitive control for procedure rooms.', image: 'https://images.unsplash.com/photo-1559757175-0eb30cd8c063?auto=format&fit=crop&w=1000&q=85' },
-  { name: 'Respiratory Care', category: 'Critical care', description: 'Equipment for respiratory support, recovery, and monitored care.', image: 'https://images.unsplash.com/photo-1583911860205-72f8ac8ddcbe?auto=format&fit=crop&w=1000&q=85' },
-  { name: 'Sterilization & Reprocessing', category: 'Care systems', description: 'Practical reprocessing support for safe, repeatable clinical workflows.', image: 'https://images.unsplash.com/photo-1584362917165-526a968579e8?auto=format&fit=crop&w=1000&q=85' },
-]
 
 function ProductCard({ item, onQuote }: { item: CatalogItem; onQuote: () => void }) {
   const imagesList = item.images && item.images.length > 0 ? item.images : (item.image ? [item.image] : [])
@@ -81,13 +73,13 @@ function ProductCard({ item, onQuote }: { item: CatalogItem; onQuote: () => void
 
 export default function ProductsPage() {
   const [quoteOpen, setQuoteOpen] = useState(false)
-  const [liveCatalog, setLiveCatalog] = useState<CatalogItem[]>(catalog)
+  const [liveCatalog, setLiveCatalog] = useState<CatalogItem[]>([])
 
   useEffect(() => {
     fetch('/api/products')
       .then((response) => (response.ok ? response.json() : []))
       .then((items) => {
-        if (Array.isArray(items) && items.length) setLiveCatalog(items)
+        if (Array.isArray(items)) setLiveCatalog(items)
       })
       .catch(() => undefined)
   }, [])
@@ -118,7 +110,7 @@ export default function ProductsPage() {
               key={category}
               onClick={() => setFilter(category)}
               className={`rounded-full px-4 py-2 text-sm font-semibold transition ${
-                filter === category ? 'bg-[#102a43] text-white' : 'text-slate-600 hover:bg-orange-50 hover:text-[#f36f2b]'
+                filter === category ? 'bg-[#102a43] text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
               }`}
             >
               {category}
@@ -135,6 +127,13 @@ export default function ProductsPage() {
             <ProductCard key={item.name} item={item} onQuote={() => setQuoteOpen(true)} />
           ))}
         </div>
+
+        {items.length === 0 && (
+          <div className="rounded-2xl border border-slate-200 bg-white p-12 text-center">
+            <p className="text-lg font-semibold text-slate-700">No equipment found matching your selection.</p>
+            <p className="mt-1 text-sm text-slate-500">Try selecting another category or check back later.</p>
+          </div>
+        )}
       </section>
 
       <section className="mx-auto max-w-7xl px-5 pb-20 lg:px-8">
