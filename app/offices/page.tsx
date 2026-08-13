@@ -1,42 +1,25 @@
 'use client'
 
+import { useEffect, useState } from 'react'
 import { Building2, ExternalLink, MapPin, Phone } from 'lucide-react'
 import { SiteFooter, SiteHeader, SectionIntro } from '@/components/site-shell'
 import { useLanguage } from '@/lib/language-context'
+import { DEFAULT_OFFICES, type OfficeItem } from '@/lib/offices-data'
 
 export default function OfficesPage() {
   const { t } = useLanguage()
+  const [offices, setOffices] = useState<OfficeItem[]>(DEFAULT_OFFICES)
 
-  const regionalOffices = [
-    {
-      city: 'Delhi (NCR)',
-      state: 'Delhi',
-      label: t('mainBranchHq'),
-      isMain: true,
-      address: 'DDA BUILDING, LAXMI NAGAR COMMERCIAL COMPLEX, DELHI 110092',
-      phone: '011-36650267',
-      mobile: '+91 96259 70722',
-      mapUrl: 'https://www.google.com/maps/search/?api=1&query=DDA+BUILDING+LAXMI+NAGAR+COMMERCIAL+COMPLEX+DELHI+110092',
-    },
-    {
-      city: 'Patna',
-      state: 'Bihar',
-      label: t('patnaBranch'),
-      isMain: false,
-      address: 'Ground Floor, Gokul Nagar, Patna, Bihar',
-      mobile: '+91 96259 70722',
-      mapUrl: 'https://www.google.com/maps/search/?api=1&query=Ground+Floor+Gokul+Nagar+Patna+Bihar',
-    },
-    {
-      city: 'Lucknow',
-      state: 'Uttar Pradesh',
-      label: t('lucknowBranch'),
-      isMain: false,
-      address: 'Near KGMC, Chowk, Lucknow-226003, Uttar Pradesh',
-      mobile: '+91 96259 70722',
-      mapUrl: 'https://www.google.com/maps/search/?api=1&query=Near+KGMC+Chowk+Lucknow+226003',
-    },
-  ]
+  useEffect(() => {
+    fetch('/api/offices')
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (Array.isArray(data) && data.length > 0) {
+          setOffices(data)
+        }
+      })
+      .catch(() => undefined)
+  }, [])
 
   return (
     <main className="bg-[#f7fafb] text-[#102a43]">
@@ -49,9 +32,9 @@ export default function OfficesPage() {
         />
 
         <div className="mt-14 grid gap-6 md:grid-cols-3">
-          {regionalOffices.map((office) => (
+          {offices.map((office, idx) => (
             <article
-              key={office.city}
+              key={office._id || office.city || idx}
               className={`group flex flex-col justify-between rounded-3xl border bg-white p-7 shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-xl ${
                 office.isMain
                   ? 'border-[#f36f2b]/40 ring-2 ring-[#f36f2b]/20 shadow-orange-500/5'

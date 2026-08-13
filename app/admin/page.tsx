@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useMemo, useState } from 'react'
-import { ImagePlus, Trash2, X } from 'lucide-react'
+import { Building2, Edit3, ExternalLink, ImagePlus, MapPin, Phone, PlusCircle, Trash2, X } from 'lucide-react'
 
 type Product = {
   _id?: string
@@ -28,7 +28,17 @@ type Metrics = {
   yearly: number
   products: { name: string; clicks: number }[]
 }
-
+type Office = {
+  _id?: string
+  city: string
+  state?: string
+  label?: string
+  isMain?: boolean
+  address: string
+  phone?: string
+  mobile?: string
+  mapUrl?: string
+}
 
 export default function AdminPage() {
   const [active, setActive] = useState('Overview')
@@ -46,20 +56,47 @@ export default function AdminPage() {
   const [settings, setSettings] = useState({ phone: '', whatsapp: '', email: '' })
   const [message, setMessage] = useState('')
 
+  // Regional Offices state
+  const [offices, setOffices] = useState<Office[]>([])
+  const [officeForm, setOfficeForm] = useState<Office>({
+    city: '',
+    state: '',
+    label: '',
+    address: '',
+    phone: '',
+    mobile: '',
+    mapUrl: '',
+    isMain: false,
+  })
+  const [editingOfficeId, setEditingOfficeId] = useState<string | null>(null)
+  const [officeSaving, setOfficeSaving] = useState(false)
+
   // Product form state
   const [form, setForm] = useState({ name: '', category: '', description: '' })
   const [images, setImages] = useState<string[]>([])
   const [uploading, setUploading] = useState(false)
   const [newCategory, setNewCategory] = useState(false)
 
-  const nav = ['Overview', 'Products', 'Leads & enquiries', 'Analytics', 'Settings']
+  const nav = ['Overview', 'Products', 'Regional Offices', 'Leads & enquiries', 'Analytics', 'Settings']
+
+  const loadOffices = async () => {
+    try {
+      const res = await fetch('/api/admin/offices')
+      if (res.ok) {
+        setOffices(await res.json())
+      }
+    } catch {
+      // Ignore
+    }
+  }
 
   const load = async () => {
-    const [p, l, a, s] = await Promise.all([
+    const [p, l, a, s, o] = await Promise.all([
       fetch('/api/admin/products'),
       fetch('/api/admin/quotes'),
       fetch('/api/admin/analytics'),
       fetch('/api/admin/settings'),
+      fetch('/api/admin/offices'),
     ])
     if (p.ok) {
       setProducts(await p.json())
@@ -68,11 +105,81 @@ export default function AdminPage() {
     if (l.ok) setLeads((await l.json()).quotes || [])
     if (a.ok) setMetrics(await a.json())
     if (s.ok) setSettings(await s.json())
+    if (o.ok) setOffices(await o.json())
   }
 
   useEffect(() => {
     load()
   }, [])
+
+  async function saveOffice(e: React.FormEvent) {
+    e.preventDefault()
+    if (!officeForm.city || !officeForm.address) {
+      alert('City and Full Address are required!')
+      return
+    }
+    setOfficeSaving(true)
+    try {
+      const isEdit = Boolean(editingOfficeId)
+      const url = '/api/admin/offices'
+      const method = isEdit ? 'PUT' : 'POST'
+      const payload = isEdit ? { ...officeForm, _id: editingOfficeId } : officeForm
+
+      const res = await fetch(url, {
+        method,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      })
+
+      if (res.ok) {
+        setMessage(isEdit ? 'Office updated successfully!' : 'New office added successfully!')
+        setOfficeForm({ city: '', state: '', label: '', address: '', phone: '', mobile: '', mapUrl: '', isMain: false })
+        setEditingOfficeId(null)
+        loadOffices()
+      } else {
+        const err = await res.json()
+        alert(err.error || 'Failed to save office')
+      }
+    } catch {
+      alert('Server error saving office')
+    } finally {
+      setOfficeSaving(false)
+    }
+  }
+
+  async function deleteOffice(office: Office) {
+    if (!confirm(`Are you sure you want to delete ${office.city} office?`)) return
+    try {
+      const res = await fetch(`/api/admin/offices?id=${office._id || ''}&city=${encodeURIComponent(office.city)}`, {
+        method: 'DELETE',
+      })
+      if (res.ok) {
+        setMessage(`Deleted ${office.city} office.`)
+        loadOffices()
+      }
+    } catch {
+      alert('Failed to delete office')
+    }
+  }
+
+  function startEditOffice(office: Office) {
+    setEditingOfficeId(office._id || office.city)
+    setOfficeForm({
+      city: office.city || '',
+      state: office.state || '',
+      label: office.label || '',
+      address: office.address || '',
+      phone: office.phone || '',
+      mobile: office.mobile || '',
+      mapUrl: office.mapUrl || '',
+      isMain: Boolean(office.isMain),
+    })
+  }
+
+  function cancelEditOffice() {
+    setEditingOfficeId(null)
+    setOfficeForm({ city: '', state: '', label: '', address: '', phone: '', mobile: '', mapUrl: '', isMain: false })
+  }
 
   const categories = useMemo(
     () => Array.from(new Set(products.map((p) => p.category))),
@@ -398,6 +505,191 @@ export default function AdminPage() {
                     No products in catalogue yet. Use the form on the left to add a product (1 to 5 photos).
                   </div>
                 )}
+              </div>
+            </div>
+          )}
+
+          {active === 'Regional Offices' && (
+            <div className="grid gap-6 lg:grid-cols-[400px_1fr]">
+              {/* Left Column Form */}
+              <form onSubmit={saveOffice} className="rounded-2xl border border-[#dce8eb] bg-white p-5 shadow-sm">
+                <div className="flex items-center justify-between">
+                  <h2 className="font-semibold text-lg">{editingOfficeId ? 'Edit Regional Office' : 'Add Regional Office'}</h2>
+                  {editingOfficeId && (
+                    <button type="button" onClick={cancelEditOffice} className="text-xs font-semibold text-slate-500 hover:text-slate-800">
+                      Cancel edit
+                    </button>
+                  )}
+                </div>
+
+                <div className="mt-4 grid gap-3">
+                  <label className="grid gap-1 text-xs font-semibold text-slate-600">
+                    Branch Label / Title
+                    <input
+                      required
+                      placeholder="e.g. Main Branch (Headquarters), Patna Branch"
+                      value={officeForm.label}
+                      onChange={(e) => setOfficeForm({ ...officeForm, label: e.target.value })}
+                      className="rounded-xl border border-slate-200 p-3 text-sm outline-none focus:border-[#f36f2b]"
+                    />
+                  </label>
+
+                  <div className="grid grid-cols-2 gap-2">
+                    <label className="grid gap-1 text-xs font-semibold text-slate-600">
+                      City *
+                      <input
+                        required
+                        placeholder="e.g. Delhi (NCR), Patna"
+                        value={officeForm.city}
+                        onChange={(e) => setOfficeForm({ ...officeForm, city: e.target.value })}
+                        className="rounded-xl border border-slate-200 p-3 text-sm outline-none focus:border-[#f36f2b]"
+                      />
+                    </label>
+
+                    <label className="grid gap-1 text-xs font-semibold text-slate-600">
+                      State
+                      <input
+                        placeholder="e.g. Delhi, Bihar, UP"
+                        value={officeForm.state}
+                        onChange={(e) => setOfficeForm({ ...officeForm, state: e.target.value })}
+                        className="rounded-xl border border-slate-200 p-3 text-sm outline-none focus:border-[#f36f2b]"
+                      />
+                    </label>
+                  </div>
+
+                  <label className="grid gap-1 text-xs font-semibold text-slate-600">
+                    Full Physical Address *
+                    <textarea
+                      required
+                      placeholder="Enter full building address, area, pincode..."
+                      value={officeForm.address}
+                      onChange={(e) => setOfficeForm({ ...officeForm, address: e.target.value })}
+                      className="min-h-24 rounded-xl border border-slate-200 p-3 text-sm outline-none focus:border-[#f36f2b]"
+                    />
+                  </label>
+
+                  <label className="grid gap-1 text-xs font-semibold text-slate-600">
+                    Landline Phone (HQ)
+                    <input
+                      placeholder="e.g. 011-36650267"
+                      value={officeForm.phone}
+                      onChange={(e) => setOfficeForm({ ...officeForm, phone: e.target.value })}
+                      className="rounded-xl border border-slate-200 p-3 text-sm outline-none focus:border-[#f36f2b]"
+                    />
+                  </label>
+
+                  <label className="grid gap-1 text-xs font-semibold text-slate-600">
+                    Mobile / WhatsApp Number
+                    <input
+                      placeholder="e.g. +91 96259 70722"
+                      value={officeForm.mobile}
+                      onChange={(e) => setOfficeForm({ ...officeForm, mobile: e.target.value })}
+                      className="rounded-xl border border-slate-200 p-3 text-sm outline-none focus:border-[#f36f2b]"
+                    />
+                  </label>
+
+                  <label className="grid gap-1 text-xs font-semibold text-slate-600">
+                    Google Maps Share Link
+                    <input
+                      placeholder="https://www.google.com/maps/..."
+                      value={officeForm.mapUrl}
+                      onChange={(e) => setOfficeForm({ ...officeForm, mapUrl: e.target.value })}
+                      className="rounded-xl border border-slate-200 p-3 text-sm outline-none focus:border-[#f36f2b]"
+                    />
+                  </label>
+
+                  <label className="flex items-center gap-2 pt-2 text-sm font-semibold text-slate-700">
+                    <input
+                      type="checkbox"
+                      checked={officeForm.isMain}
+                      onChange={(e) => setOfficeForm({ ...officeForm, isMain: e.target.checked })}
+                      className="size-4 accent-[#f36f2b]"
+                    />
+                    Mark as Main Headquarters (Delhi HQ)
+                  </label>
+
+                  <button
+                    disabled={officeSaving}
+                    className="mt-3 rounded-full bg-[#f36f2b] p-3.5 font-bold text-white transition hover:bg-[#dd5b1d] disabled:opacity-60"
+                  >
+                    {officeSaving ? 'Saving office...' : editingOfficeId ? 'Update office' : 'Add office'}
+                  </button>
+                </div>
+              </form>
+
+              {/* Right Column List */}
+              <div>
+                <h2 className="text-[#102a43] text-xl font-semibold">Current Regional Offices ({offices.length})</h2>
+                <p className="mt-1 text-sm text-[#6f8793]">
+                  These offices appear live on the website branch network page (`/offices`) and customer contact buttons.
+                </p>
+
+                <div className="mt-4 grid gap-4 md:grid-cols-2">
+                  {offices.map((office, idx) => (
+                    <article
+                      key={office._id || office.city || idx}
+                      className={`flex flex-col justify-between rounded-2xl border p-5 bg-white shadow-sm transition ${
+                        office.isMain ? 'border-[#f36f2b] ring-1 ring-[#f36f2b]/30' : 'border-slate-200'
+                      }`}
+                    >
+                      <div>
+                        <div className="flex items-start justify-between gap-2">
+                          <span
+                            className={`rounded-full px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-wider ${
+                              office.isMain ? 'bg-[#f36f2b] text-white' : 'bg-slate-100 text-[#0c6670]'
+                            }`}
+                          >
+                            {office.label || office.city}
+                          </span>
+                          {office.isMain && (
+                            <span className="text-[11px] font-semibold text-[#f36f2b]">Main HQ</span>
+                          )}
+                        </div>
+
+                        <h3 className="mt-3 text-lg font-bold text-[#102a43]">{office.city}</h3>
+                        {office.state && <p className="text-xs font-bold uppercase text-slate-400">{office.state}</p>}
+
+                        <p className="mt-3 text-sm text-slate-600 leading-relaxed">{office.address}</p>
+
+                        <div className="mt-4 space-y-1 text-xs">
+                          {office.phone && (
+                            <p className="font-semibold text-slate-700 flex items-center gap-1.5">
+                              <Phone className="size-3.5 text-[#f36f2b]" /> Landline: {office.phone}
+                            </p>
+                          )}
+                          {office.mobile && (
+                            <p className="font-semibold text-slate-700 flex items-center gap-1.5">
+                              <Phone className="size-3.5 text-[#49a878]" /> Mobile/WA: {office.mobile}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+
+                      <div className="mt-5 flex items-center gap-2 border-t border-slate-100 pt-4">
+                        <button
+                          type="button"
+                          onClick={() => startEditOffice(office)}
+                          className="flex flex-1 items-center justify-center gap-1.5 rounded-xl border border-slate-200 py-2 text-xs font-bold text-slate-700 transition hover:bg-slate-50"
+                        >
+                          <Edit3 className="size-3.5 text-[#0c6670]" /> Edit
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => deleteOffice(office)}
+                          className="flex flex-1 items-center justify-center gap-1.5 rounded-xl border border-red-200 py-2 text-xs font-bold text-red-600 transition hover:bg-red-50"
+                        >
+                          <Trash2 className="size-3.5" /> Delete
+                        </button>
+                      </div>
+                    </article>
+                  ))}
+
+                  {!offices.length && (
+                    <div className="col-span-2 rounded-2xl border border-dashed border-[#dce8eb] p-10 text-center text-sm text-[#6f8793]">
+                      No regional offices added yet.
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
           )}
