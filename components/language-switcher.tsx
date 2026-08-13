@@ -9,8 +9,25 @@ export function LanguageSwitcher() {
   const [open, setOpen] = useState(false)
   const currentOption = LANGUAGES.find((l) => l.code === language) || LANGUAGES[0]
 
+  const triggerFullPageTranslation = (targetLang: string) => {
+    const lang = targetLang === 'en' ? 'en' : targetLang
+    document.cookie = `googtrans=/en/${lang}; path=/; domain=${window.location.hostname}`
+    document.cookie = `googtrans=/en/${lang}; path=/`
+
+    const select = document.querySelector('.goog-te-combo') as HTMLSelectElement | null
+    if (select) {
+      select.value = lang
+      select.dispatchEvent(new Event('change'))
+    }
+  }
+
+  const handleSelect = (langCode: Language) => {
+    setLanguage(langCode)
+    setOpen(false)
+    triggerFullPageTranslation(langCode)
+  }
+
   useEffect(() => {
-    // Inject Google Translate script if not already present for auto-translation option
     const existingScript = document.getElementById('google-translate-script')
     if (!existingScript) {
       const script = document.createElement('script')
@@ -46,7 +63,7 @@ export function LanguageSwitcher() {
       {open && (
         <>
           <div className="fixed inset-0 z-40" onClick={() => setOpen(false)} />
-          <div className="absolute right-0 top-full z-50 mt-2 w-48 rounded-2xl border border-slate-200 bg-white p-2 shadow-xl backdrop-blur-xl">
+          <div className="absolute right-0 top-full z-50 mt-2 max-h-80 w-52 overflow-y-auto rounded-2xl border border-slate-200 bg-white p-2 shadow-2xl backdrop-blur-xl">
             <p className="px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-slate-400">
               {t('selectLanguage')}
             </p>
@@ -55,10 +72,7 @@ export function LanguageSwitcher() {
                 <button
                   key={lang.code}
                   type="button"
-                  onClick={() => {
-                    setLanguage(lang.code)
-                    setOpen(false)
-                  }}
+                  onClick={() => handleSelect(lang.code)}
                   className={`flex items-center justify-between rounded-xl px-3 py-2 text-xs font-semibold transition ${
                     language === lang.code
                       ? 'bg-orange-50 text-[#f36f2b]'
@@ -76,7 +90,7 @@ export function LanguageSwitcher() {
             </div>
 
             <div className="mt-2 border-t border-slate-100 pt-2">
-              <div id="google_translate_element" className="scale-90 transform-gpu opacity-80" />
+              <div id="google_translate_element" className="scale-90 transform-gpu opacity-90" />
             </div>
           </div>
         </>

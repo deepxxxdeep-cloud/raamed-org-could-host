@@ -171,3 +171,29 @@
     outline-offset: 3px;
   }
 }
+
+/* Google Translate Widget & Frame Styling */
+.goog-te-banner-frame.skiptranslate, iframe.goog-te-banner-frame {
+  display: none !important;
+}
+body {
+  top: 0px !important;
+}
+.goog-te-gadget {
+  display: inline-block !important;
+  font-size: 0px !important;
+}
+.goog-te-combo {
+  border-radius: 0.75rem !important;
+  border: 1px solid #cbd5e1 !important;
+  padding: 0.35rem 0.6rem !important;
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  color: #1e293b !important;
+  background-color: #f8fafc !important;
+  outline: none !important;
+}
+.goog-text-highlight {
+  background-color: transparent !important;
+  box-shadow: none !important;
+}
