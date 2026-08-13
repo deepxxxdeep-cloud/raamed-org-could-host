@@ -103,7 +103,7 @@ export function SiteFooter() {
         <div>
           <img src={logoUrl} alt="Raamed logo - RAAMED / RAMMED Medical Equipment" className="h-16 w-56 rounded-xl bg-white object-contain p-1" />
           <p className="mt-5 max-w-sm text-sm leading-7 text-slate-300">
-            Raamed (RAAMED / RAMMED) – Reliable medical equipment, practical expertise, and responsive support for hospitals, clinics, and healthcare teams across India.
+            {t('raamedDescription')}
           </p>
         </div>
         <div>
@@ -141,7 +141,24 @@ export function SectionIntro({ eyebrow, title, text }: { eyebrow: string; title:
 }
 
 export function MediaCard({ title, type, tone = 'bg-[#d9f2ef]' }: { title: string; type: string; tone?: string }) {
-  return <article className="group overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-xl"><div className={`relative flex h-52 items-center justify-center ${tone}`}><div className="rounded-2xl border border-white/70 bg-white/65 px-5 py-4 text-center shadow-lg backdrop-blur"><p className="text-xs font-bold uppercase tracking-[.18em] text-[#0c6670]">{type}</p><p className="mt-2 font-semibold text-[#102a43]">Raamed media</p></div><span className="absolute bottom-4 left-4 rounded-full bg-white/80 px-3 py-1 text-xs font-bold text-[#102a43]">Preview coming soon</span></div><div className="p-5"><h3 className="font-semibold text-[#102a43]">{title}</h3><p className="mt-2 text-sm leading-6 text-slate-500">A dedicated place for our clinical stories, equipment demonstrations, and team updates.</p></div></article>
+  const { t } = useLanguage()
+  return (
+    <article className="group overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-xl">
+      <div className={`relative flex h-52 items-center justify-center ${tone}`}>
+        <div className="rounded-2xl border border-white/70 bg-white/65 px-5 py-4 text-center shadow-lg backdrop-blur">
+          <p className="text-xs font-bold uppercase tracking-[.18em] text-[#0c6670]">{type}</p>
+          <p className="mt-2 font-semibold text-[#102a43]">Raamed media</p>
+        </div>
+        <span className="absolute bottom-4 left-4 rounded-full bg-white/80 px-3 py-1 text-xs font-bold text-[#102a43]">
+          {t('previewComingSoon')}
+        </span>
+      </div>
+      <div className="p-5">
+        <h3 className="font-semibold text-[#102a43]">{title}</h3>
+        <p className="mt-2 text-sm leading-6 text-slate-500">{t('mediaDescription')}</p>
+      </div>
+    </article>
+  )
 }
 
 export const regionalOffices = [

@@ -71,20 +71,20 @@ export default function Page() {
 
       <section className="border-y border-slate-200 bg-white px-5 py-7 lg:px-8">
         <div className="mx-auto grid max-w-7xl gap-5 sm:grid-cols-3">
-          <div><p className="text-3xl font-semibold text-[#102a43]">15+</p><p className="mt-1 text-sm text-slate-500">Years of clinical experience</p></div>
-          <div><p className="text-3xl font-semibold text-[#102a43]">3</p><p className="mt-1 text-sm text-slate-500">Key branches across India (Delhi HQ)</p></div>
-          <div><p className="text-3xl font-semibold text-[#102a43]">24h</p><p className="mt-1 text-sm text-slate-500">Typical response window</p></div>
+          <div><p className="text-3xl font-semibold text-[#102a43]">15+</p><p className="mt-1 text-sm text-slate-500">{t('yearsExpText')}</p></div>
+          <div><p className="text-3xl font-semibold text-[#102a43]">3</p><p className="mt-1 text-sm text-slate-500">{t('keyBranchesText')}</p></div>
+          <div><p className="text-3xl font-semibold text-[#102a43]">24h</p><p className="mt-1 text-sm text-slate-500">{t('responseWindowText')}</p></div>
         </div>
       </section>
 
       <section id="products" className="mx-auto max-w-7xl px-5 py-20 lg:px-8">
         <div className="flex flex-wrap items-end justify-between gap-5">
           <div>
-            <p className="text-sm font-bold uppercase tracking-[.18em] text-[#f36f2b]">The equipment desk</p>
-            <h2 className="mt-3 text-4xl font-semibold tracking-tight">Built around the way care works.</h2>
+            <p className="text-sm font-bold uppercase tracking-[.18em] text-[#f36f2b]">{t('equipmentDesk')}</p>
+            <h2 className="mt-3 text-4xl font-semibold tracking-tight">{t('builtAroundCare')}</h2>
           </div>
           <Link href="/products" className="font-bold text-[#0c6670]">
-            See full catalogue <ArrowRight className="ml-1 inline size-4" />
+            {t('seeFullCatalogue')} <ArrowRight className="ml-1 inline size-4" />
           </Link>
         </div>
 
@@ -105,7 +105,7 @@ export default function Page() {
                 </div>
                 <div className="p-6 pt-0">
                   <button onClick={() => setQuoteOpen(true)} className="mt-2 font-bold text-[#f36f2b] inline-flex items-center">
-                    Enquire about this <ArrowRight className="ml-1 inline size-4" />
+                    {t('enquireAboutThis')} <ArrowRight className="ml-1 inline size-4" />
                   </button>
                 </div>
               </article>
@@ -115,8 +115,8 @@ export default function Page() {
 
         {loaded && liveProducts.length === 0 && (
           <div className="mt-10 rounded-2xl border border-slate-200 bg-white p-12 text-center">
-            <p className="text-lg font-semibold text-slate-700">No equipment currently listed in the catalogue.</p>
-            <p className="mt-1 text-sm text-slate-500">Check back later or contact us directly for specific equipment inquiries.</p>
+            <p className="text-lg font-semibold text-slate-700">{t('noEquipmentFound')}</p>
+            <p className="mt-1 text-sm text-slate-500">{t('checkBackLater')}</p>
           </div>
         )}
       </section>
@@ -124,18 +124,18 @@ export default function Page() {
       <section className="bg-[#e9f5f3] px-5 py-20 lg:px-8">
         <div className="mx-auto grid max-w-7xl gap-10 lg:grid-cols-[1fr_.8fr] lg:items-center">
           <div>
-            <p className="text-sm font-bold uppercase tracking-[.18em] text-[#f36f2b]">A better handover</p>
-            <h2 className="mt-3 text-4xl font-semibold tracking-tight">Equipment is only the beginning.</h2>
+            <p className="text-sm font-bold uppercase tracking-[.18em] text-[#f36f2b]">{t('betterHandover')}</p>
+            <h2 className="mt-3 text-4xl font-semibold tracking-tight">{t('equipmentBeginning')}</h2>
             <p className="mt-5 max-w-xl text-lg leading-8 text-slate-600">
-              From product selection to installation and service, our team stays close to your workflow. Get a clear recommendation, transparent documentation, and support that answers.
+              {t('handoverSubtitle')}
             </p>
             <button onClick={() => setQuoteOpen(true)} className="mt-7 rounded-full bg-[#102a43] px-6 py-3.5 font-bold text-white transition hover:-translate-y-0.5">
-              Talk to a specialist
+              {t('talkToSpecialist')}
             </button>
           </div>
           <div className="grid gap-4 sm:grid-cols-2">
-            <MediaCard title="Inside our clinical support" type="Video" tone="bg-[#102a43]" />
-            <MediaCard title="Raamed in the field" type="Photo" tone="bg-[#fff0e8]" />
+            <MediaCard title={t('insideClinicalSupport')} type="Video" tone="bg-[#102a43]" />
+            <MediaCard title={t('raamedInField')} type="Photo" tone="bg-[#fff0e8]" />
           </div>
         </div>
       </section>
