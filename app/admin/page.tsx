@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useMemo, useState } from 'react'
-import { Building2, Edit3, ExternalLink, ImagePlus, MapPin, Phone, PlusCircle, Trash2, X } from 'lucide-react'
+import { Building2, Edit3, ExternalLink, ImagePlus, MapPin, Menu, Phone, PlusCircle, Trash2, X } from 'lucide-react'
 
 type Product = {
   _id?: string
@@ -42,6 +42,7 @@ type Office = {
 
 export default function AdminPage() {
   const [active, setActive] = useState('Overview')
+  const [mobileNavOpen, setMobileNavOpen] = useState(false)
   const [products, setProducts] = useState<Product[]>([])
   const [loaded, setLoaded] = useState(false)
   const [leads, setLeads] = useState<Lead[]>([])
@@ -276,7 +277,8 @@ export default function AdminPage() {
 
   return (
     <main className="min-h-screen bg-[#f6f9fa] text-[#102a43]">
-      <aside className="fixed inset-y-0 left-0 hidden w-72 border-r border-[#dce8eb] bg-white p-6 lg:block">
+      {/* Desktop Sidebar */}
+      <aside className="fixed inset-y-0 left-0 hidden w-72 border-r border-[#dce8eb] bg-white p-6 lg:block z-30">
         <a href="/" className="text-xl font-bold">
           Raamed
           <span className="block text-xs font-normal text-[#6f8793]">Admin workspace</span>
@@ -286,8 +288,8 @@ export default function AdminPage() {
             <button
               key={item}
               onClick={() => setActive(item)}
-              className={`rounded-xl px-4 py-3 text-left text-sm ${
-                active === item ? 'bg-[#e5f4f2] font-semibold text-[#f36f2b]' : 'text-[#5a7484]'
+              className={`rounded-xl px-4 py-3 text-left text-sm transition ${
+                active === item ? 'bg-[#e5f4f2] font-bold text-[#f36f2b]' : 'text-[#5a7484] hover:bg-slate-50'
               }`}
             >
               {item}
@@ -296,10 +298,78 @@ export default function AdminPage() {
         </nav>
       </aside>
 
+      {/* Mobile Slide-out Drawer */}
+      {mobileNavOpen && (
+        <div className="fixed inset-0 z-50 lg:hidden">
+          {/* Backdrop overlay */}
+          <div
+            className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity"
+            onClick={() => setMobileNavOpen(false)}
+          />
+
+          {/* Drawer content panel */}
+          <div className="fixed inset-y-0 left-0 w-72 bg-white p-6 shadow-2xl flex flex-col justify-between z-50">
+            <div>
+              <div className="flex items-center justify-between">
+                <a href="/" className="text-xl font-bold">
+                  Raamed
+                  <span className="block text-xs font-normal text-[#6f8793]">Admin workspace</span>
+                </a>
+                <button
+                  type="button"
+                  onClick={() => setMobileNavOpen(false)}
+                  className="rounded-full p-2 text-slate-500 hover:bg-slate-100 hover:text-slate-900"
+                  aria-label="Close menu"
+                >
+                  <X className="size-6" />
+                </button>
+              </div>
+
+              <nav className="mt-10 grid gap-2">
+                {nav.map((item) => (
+                  <button
+                    key={item}
+                    onClick={() => {
+                      setActive(item)
+                      setMobileNavOpen(false)
+                    }}
+                    className={`rounded-xl px-4 py-3 text-left text-sm font-semibold transition ${
+                      active === item
+                        ? 'bg-[#e5f4f2] font-bold text-[#f36f2b] border-l-4 border-[#f36f2b]'
+                        : 'text-[#5a7484] hover:bg-slate-50'
+                    }`}
+                  >
+                    {item}
+                  </button>
+                ))}
+              </nav>
+            </div>
+
+            <div className="border-t border-slate-100 pt-4 text-xs text-slate-400">
+              Logged in as Admin • Raamed IDE
+            </div>
+          </div>
+        </div>
+      )}
+
       <section className="lg:pl-72">
-        <header className="border-b border-[#dce8eb] bg-white px-5 py-5">
-          <p className="text-sm text-[#6f8793]">Raamed operations</p>
-          <h1 className="text-2xl font-semibold">{active}</h1>
+        {/* Header with Mobile Menu Button */}
+        <header className="border-b border-[#dce8eb] bg-white px-5 py-4 flex items-center justify-between lg:px-8">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-wider text-[#6f8793]">Raamed operations</p>
+            <h1 className="text-2xl font-semibold mt-0.5">{active}</h1>
+          </div>
+
+          {/* Mobile Hamburger Button */}
+          <button
+            type="button"
+            onClick={() => setMobileNavOpen(true)}
+            className="flex items-center gap-2 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-2 text-xs font-bold text-slate-700 transition hover:bg-white hover:text-[#f36f2b] lg:hidden"
+            aria-label="Open menu options"
+          >
+            <Menu className="size-5 text-[#f36f2b]" />
+            <span>Options</span>
+          </button>
         </header>
 
         <div className="p-5 lg:p-8">
