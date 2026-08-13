@@ -2,7 +2,7 @@ import { Analytics } from '@vercel/analytics/next'
 import type { Metadata, Viewport } from 'next'
 import './globals.css'
 
-const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://raamed.org'
+const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://raamed.online'
 
 export const metadata: Metadata = {
   metadataBase: new URL(baseUrl),
@@ -16,7 +16,8 @@ export const metadata: Metadata = {
     'RAMMED',
     'Raamed',
     'Rammed',
-    'Raamed Org',
+    'Raamed Online',
+    'raamed.online',
     'Raamed Medical',
     'Raamed Medical Equipment',
     'Raamed Healthcare',
@@ -31,7 +32,7 @@ export const metadata: Metadata = {
   ],
   authors: [{ name: 'Raamed Medical Equipment', url: baseUrl }],
   creator: 'Raamed Healthcare',
-  publisher: 'Raamed Org',
+  publisher: 'Raamed Online',
   formatDetection: {
     email: false,
     address: false,
@@ -94,7 +95,7 @@ const jsonLd = {
       '@type': 'Organization',
       '@id': `${baseUrl}/#organization`,
       name: 'Raamed',
-      alternateName: ['RAAMED', 'RAMMED', 'Rammed', 'Raamed Medical', 'Raamed Org', 'Raamed Healthcare'],
+      alternateName: ['RAAMED', 'RAMMED', 'Rammed', 'Raamed Medical', 'Raamed Online', 'Raamed Healthcare'],
       url: baseUrl,
       logo: `${baseUrl}/raamed-logo.jpg`,
       image: `${baseUrl}/raamed-logo.jpg`,
@@ -127,7 +128,7 @@ const jsonLd = {
       '@id': `${baseUrl}/#website`,
       url: baseUrl,
       name: 'Raamed',
-      alternateName: ['RAAMED', 'RAMMED', 'Raamed Org'],
+      alternateName: ['RAAMED', 'RAMMED', 'Raamed Online'],
       publisher: {
         '@id': `${baseUrl}/#organization`,
       },
