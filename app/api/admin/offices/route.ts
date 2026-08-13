@@ -12,10 +12,13 @@ let localOffices = [...DEFAULT_OFFICES]
 export async function GET() {
   try {
     const db = await getDb()
-    const offices = await db.collection('offices').find().sort({ createdAt: 1 }).toArray()
-    if (offices && offices.length > 0) {
-      return NextResponse.json(offices)
+    let offices = await db.collection('offices').find().sort({ createdAt: 1 }).toArray()
+    if (!offices || offices.length === 0) {
+      // Seed default offices into DB if empty
+      await db.collection('offices').insertMany(DEFAULT_OFFICES)
+      offices = await db.collection('offices').find().sort({ createdAt: 1 }).toArray()
     }
+    return NextResponse.json(offices)
   } catch {
     // Return memory fallback
   }
