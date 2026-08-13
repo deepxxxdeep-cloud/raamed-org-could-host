@@ -827,12 +827,16 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
     const saved = localStorage.getItem('raamed_language') as Language
     if (saved && translations[saved]) {
       setLanguageState(saved)
+      document.documentElement.lang = saved
+      document.documentElement.dir = saved === 'ar' ? 'rtl' : 'ltr'
     }
   }, [])
 
   const setLanguage = (lang: Language) => {
     setLanguageState(lang)
     localStorage.setItem('raamed_language', lang)
+    document.documentElement.lang = lang
+    document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr'
   }
 
   const t = (key: string): string => {

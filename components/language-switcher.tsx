@@ -1,62 +1,18 @@
 'use client'
 
-import { useEffect, useState } from 'react'
-import { usePathname } from 'next/navigation'
+import { useState } from 'react'
 import { Check, Globe } from 'lucide-react'
 import { LANGUAGES, type Language, useLanguage } from '@/lib/language-context'
 
 export function LanguageSwitcher() {
   const { language, setLanguage, t } = useLanguage()
   const [open, setOpen] = useState(false)
-  const pathname = usePathname()
   const currentOption = LANGUAGES.find((l) => l.code === language) || LANGUAGES[0]
-
-  const triggerFullPageTranslation = (targetLang: string) => {
-    const lang = targetLang === 'en' ? 'en' : targetLang
-    document.cookie = `googtrans=/en/${lang}; path=/; domain=${window.location.hostname}`
-    document.cookie = `googtrans=/en/${lang}; path=/`
-
-    const select = document.querySelector('.goog-te-combo') as HTMLSelectElement | null
-    if (select) {
-      select.value = lang
-      select.dispatchEvent(new Event('change'))
-    }
-  }
 
   const handleSelect = (langCode: Language) => {
     setLanguage(langCode)
     setOpen(false)
-    triggerFullPageTranslation(langCode)
   }
-
-  useEffect(() => {
-    const existingScript = document.getElementById('google-translate-script')
-    if (!existingScript) {
-      const script = document.createElement('script')
-      script.id = 'google-translate-script'
-      script.src = '//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit'
-      script.async = true
-      document.body.appendChild(script)
-
-      window.googleTranslateElementInit = () => {
-        if (window.google?.translate?.TranslateElement) {
-          new window.google.translate.TranslateElement(
-            { pageLanguage: 'en', autoDisplay: false },
-            'google_translate_element'
-          )
-        }
-      }
-    }
-  }, [])
-
-  useEffect(() => {
-    if (language && language !== 'en') {
-      const timer = setTimeout(() => {
-        triggerFullPageTranslation(language)
-      }, 300)
-      return () => clearTimeout(timer)
-    }
-  }, [pathname, language])
 
   return (
     <div className="relative inline-block text-left">
@@ -99,24 +55,9 @@ export function LanguageSwitcher() {
                 </button>
               ))}
             </div>
-
-            <div className="mt-2 border-t border-slate-100 pt-2">
-              <div id="google_translate_element" className="scale-90 transform-gpu opacity-90" />
-            </div>
           </div>
         </>
       )}
     </div>
   )
-}
-
-declare global {
-  interface Window {
-    googleTranslateElementInit?: () => void
-    google?: {
-      translate?: {
-        TranslateElement: new (options: Record<string, unknown>, elementId: string) => void
-      }
-    }
-  }
 }
