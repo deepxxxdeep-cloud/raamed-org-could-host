@@ -41,7 +41,7 @@ export const COUNTRY_CODES: CountryCode[] = [
   { code: 'RU', dial: '+7', name: 'Russia', flag: '🇷🇺' },
 ]
 
-export function QuoteDialog({ open, onClose }: { open: boolean; onClose: () => void }) {
+export function QuoteDialog({ open, onClose, productName }: { open: boolean; onClose: () => void; productName?: string }) {
   const { t } = useLanguage()
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle')
   const [error, setError] = useState('')
@@ -61,6 +61,9 @@ export function QuoteDialog({ open, onClose }: { open: boolean; onClose: () => v
     
     const fullPhone = `${selectedCountry.dial} ${phoneRaw.trim()}`
     payload.phone = fullPhone
+    if (productName) {
+      payload.productName = productName
+    }
 
     const response = await fetch('/api/quotes', {
       method: 'POST',
@@ -81,11 +84,20 @@ export function QuoteDialog({ open, onClose }: { open: boolean; onClose: () => v
       <div className="w-full max-w-2xl rounded-3xl bg-white p-6 shadow-2xl sm:p-8">
         <div className="flex items-start justify-between gap-4">
           <div>
-            <p className="text-xs font-bold uppercase tracking-[.18em] text-[#f36f2b]">Talk to Raamed</p>
+            <div className="flex items-center gap-2">
+              <p className="text-xs font-bold uppercase tracking-[.18em] text-[#f36f2b]">Talk to Raamed</p>
+              {productName && (
+                <span className="rounded-full bg-orange-100 px-2.5 py-0.5 text-[11px] font-bold text-[#f36f2b]">
+                  {productName}
+                </span>
+              )}
+            </div>
             <h2 id="quote-title" className="mt-2 text-3xl font-semibold tracking-tight text-[#102a43]">
               {t('requestQuote')}
             </h2>
-            <p className="mt-2 text-sm text-slate-500">Share your details and our team will contact you.</p>
+            <p className="mt-2 text-sm text-slate-500">
+              {productName ? `Inquiring for "${productName}". Share your details below.` : 'Share your details and our team will contact you.'}
+            </p>
           </div>
           <button onClick={onClose} aria-label="Close quote form" className="rounded-full p-2 text-slate-500 hover:bg-slate-100">
             <X />

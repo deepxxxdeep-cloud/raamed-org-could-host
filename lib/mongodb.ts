@@ -16,19 +16,23 @@ export async function getDb(): Promise<Db> {
 }
 
 export type Quote = {
+  _id?: string
   name: string
   address: string
   phone: string
   email: string
   organization?: string
   message?: string
+  productName?: string
   createdAt: Date
-  status: 'New' | 'Contacted' | 'Converted'
+  status: 'New' | 'Contacted' | 'Converted' | 'Finalized' | 'Not Finalized' | 'Pending'
+  finalAmount?: string
+  reason?: string
 }
 
 export async function createQuote(input: Omit<Quote, 'createdAt' | 'status'>) {
   const db = await getDb()
-  const quote: Quote = { ...input, createdAt: new Date(), status: 'New' }
+  const quote: Quote = { ...input, createdAt: new Date(), status: 'Pending' }
   const result = await db.collection<Quote>('quotes').insertOne(quote)
   return { ...quote, id: result.insertedId.toString() }
 }

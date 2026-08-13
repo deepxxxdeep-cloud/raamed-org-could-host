@@ -12,13 +12,18 @@ type Product = {
   images?: string[]
 }
 type Lead = {
+  _id?: string
   name?: string
   email?: string
   phone?: string
   organization?: string
   address?: string
   message?: string
+  productName?: string
   createdAt?: string
+  status?: 'Pending' | 'Finalized' | 'Not Finalized' | string
+  finalAmount?: string
+  reason?: string
 }
 type Metrics = {
   visitors: number
@@ -56,6 +61,13 @@ export default function AdminPage() {
   })
   const [settings, setSettings] = useState({ phone: '', whatsapp: '', email: '' })
   const [message, setMessage] = useState('')
+
+  // Deal tracking state
+  const [dealModalLead, setDealModalLead] = useState<Lead | null>(null)
+  const [dealStatus, setDealStatus] = useState<'Pending' | 'Finalized' | 'Not Finalized'>('Pending')
+  const [dealAmount, setDealAmount] = useState('')
+  const [dealReason, setDealReason] = useState('')
+  const [updatingDeal, setUpdatingDeal] = useState(false)
 
   // Regional Offices state
   const [offices, setOffices] = useState<Office[]>([])
@@ -180,6 +192,46 @@ export default function AdminPage() {
   function cancelEditOffice() {
     setEditingOfficeId(null)
     setOfficeForm({ city: '', state: '', label: '', address: '', phone: '', mobile: '', mapUrl: '', isMain: false })
+  }
+
+  const openDealModal = (lead: Lead) => {
+    setDealModalLead(lead)
+    const st = (lead.status as 'Pending' | 'Finalized' | 'Not Finalized') || 'Pending'
+    setDealStatus(st === 'Finalized' || st === 'Not Finalized' ? st : 'Pending')
+    setDealAmount(lead.finalAmount || '')
+    setDealReason(lead.reason || '')
+  }
+
+  const saveDealStatus = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!dealModalLead) return
+    setUpdatingDeal(true)
+
+    try {
+      const res = await fetch('/api/admin/quotes', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          _id: dealModalLead._id,
+          email: dealModalLead.email,
+          status: dealStatus,
+          finalAmount: dealStatus === 'Finalized' ? dealAmount : '',
+          reason: dealStatus === 'Not Finalized' ? dealReason : '',
+        }),
+      })
+
+      if (res.ok) {
+        setMessage(`Updated deal status for ${dealModalLead.name || 'lead'}`)
+        setDealModalLead(null)
+        load()
+      } else {
+        alert('Failed to update deal status')
+      }
+    } catch {
+      alert('Error updating deal status')
+    } finally {
+      setUpdatingDeal(false)
+    }
   }
 
   const categories = useMemo(
@@ -765,40 +817,234 @@ export default function AdminPage() {
           )}
 
           {active === 'Leads & enquiries' && (
-            <div className="rounded-2xl border border-[#dce8eb] bg-white p-5">
-              <div className="flex justify-between">
-                <h2 className="font-semibold">All lead enquiries</h2>
-                <button onClick={() => window.print()} className="rounded-xl border px-4 py-2 text-sm">
-                  Print all leads
+            <div className="rounded-2xl border border-[#dce8eb] bg-white p-5 shadow-sm">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h2 className="font-semibold text-lg">All Lead Enquiries & Deal Tracking</h2>
+                  <p className="text-xs text-[#6f8793] mt-0.5">Track deal statuses, final amounts, rejection reasons, and product enquiries.</p>
+                </div>
+                <button onClick={() => window.print()} className="rounded-xl border border-slate-200 px-4 py-2 text-xs font-bold text-slate-700 hover:bg-slate-50">
+                  Print lead report
                 </button>
               </div>
+
               <div className="mt-5 overflow-x-auto">
-                <table className="w-full text-left text-sm">
+                <table className="w-full text-left text-sm border-collapse">
                   <thead>
-                    <tr className="border-b text-[#6f8793]">
-                      <th className="p-3">Name</th>
-                      <th className="p-3">Email</th>
-                      <th className="p-3">Phone</th>
-                      <th className="p-3">Organization</th>
-                      <th className="p-3">Message</th>
-                      <th className="p-3">Date</th>
+                    <tr className="border-b border-slate-200 bg-slate-50 text-xs font-bold uppercase tracking-wider text-[#6f8793]">
+                      <th className="p-3.5">Product Name</th>
+                      <th className="p-3.5">Client & Contact</th>
+                      <th className="p-3.5">Requirement Details</th>
+                      <th className="p-3.5">Deal Status</th>
+                      <th className="p-3.5 text-right">Action</th>
                     </tr>
                   </thead>
-                  <tbody>
+                  <tbody className="divide-y divide-slate-100">
                     {leads.map((l, i) => (
-                      <tr key={i} className="border-b">
-                        <td className="p-3">{l.name}</td>
-                        <td className="p-3">{l.email}</td>
-                        <td className="p-3">{l.phone}</td>
-                        <td className="p-3">{l.organization}</td>
-                        <td className="max-w-xs p-3">{l.message}</td>
-                        <td className="whitespace-nowrap p-3">
-                          {l.createdAt ? new Date(l.createdAt).toLocaleDateString() : '-'}
+                      <tr key={l._id || i} className="hover:bg-slate-50/50 transition">
+                        <td className="p-3.5 align-top">
+                          <span className="inline-block rounded-xl bg-orange-100/80 px-2.5 py-1 text-xs font-bold text-[#f36f2b]">
+                            {l.productName || 'General Enquiry'}
+                          </span>
+                          <p className="mt-1 text-[11px] text-slate-400">
+                            {l.createdAt ? new Date(l.createdAt).toLocaleDateString() : 'Recent'}
+                          </p>
+                        </td>
+
+                        <td className="p-3.5 align-top">
+                          <p className="font-bold text-[#102a43]">{l.name || 'Unnamed'}</p>
+                          {l.organization && <p className="text-xs font-semibold text-[#0c6670]">{l.organization}</p>}
+                          <div className="mt-1.5 flex flex-wrap gap-2 text-xs">
+                            <a href={`mailto:${l.email}`} className="text-slate-600 underline hover:text-[#f36f2b]">
+                              {l.email}
+                            </a>
+                            {l.phone && (
+                              <a href={`tel:${l.phone}`} className="font-semibold text-emerald-700 hover:underline">
+                                {l.phone}
+                              </a>
+                            )}
+                          </div>
+                        </td>
+
+                        <td className="max-w-xs p-3.5 align-top text-xs text-slate-600">
+                          {l.address && <p className="font-medium text-slate-700">📍 {l.address}</p>}
+                          <p className="mt-1 leading-relaxed">{l.message || 'No message provided.'}</p>
+                        </td>
+
+                        <td className="p-3.5 align-top">
+                          {l.status === 'Finalized' ? (
+                            <div className="inline-flex flex-col rounded-xl bg-emerald-50 p-2 border border-emerald-200">
+                              <span className="text-xs font-bold text-emerald-700 flex items-center gap-1">
+                                🟢 Deal Finalized
+                              </span>
+                              {l.finalAmount && (
+                                <span className="mt-0.5 text-xs font-extrabold text-emerald-800">
+                                  Amount: {l.finalAmount}
+                                </span>
+                              )}
+                            </div>
+                          ) : l.status === 'Not Finalized' ? (
+                            <div className="inline-flex flex-col rounded-xl bg-red-50 p-2 border border-red-200">
+                              <span className="text-xs font-bold text-red-700 flex items-center gap-1">
+                                🔴 Deal Not Finalized
+                              </span>
+                              {l.reason && (
+                                <span className="mt-0.5 text-xs font-medium text-red-800">
+                                  Reason: {l.reason}
+                                </span>
+                              )}
+                            </div>
+                          ) : (
+                            <span className="inline-block rounded-xl bg-amber-50 px-2.5 py-1 text-xs font-bold text-amber-700 border border-amber-200">
+                              🟡 Pending / In Process
+                            </span>
+                          )}
+                        </td>
+
+                        <td className="p-3.5 align-top text-right">
+                          <button
+                            type="button"
+                            onClick={() => openDealModal(l)}
+                            className="rounded-xl border border-slate-200 bg-white px-3 py-1.5 text-xs font-bold text-slate-700 shadow-sm transition hover:border-[#f36f2b] hover:text-[#f36f2b]"
+                          >
+                            Update Deal
+                          </button>
                         </td>
                       </tr>
                     ))}
+
+                    {!leads.length && (
+                      <tr>
+                        <td colSpan={5} className="p-10 text-center text-sm text-slate-500">
+                          No lead enquiries received yet.
+                        </td>
+                      </tr>
+                    )}
                   </tbody>
                 </table>
+              </div>
+            </div>
+          )}
+
+          {/* Deal Status Update Modal */}
+          {dealModalLead && (
+            <div className="fixed inset-0 z-50 grid place-items-center bg-slate-900/60 p-4 backdrop-blur-sm">
+              <div className="w-full max-w-md rounded-3xl bg-white p-6 shadow-2xl">
+                <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+                  <div>
+                    <h3 className="font-bold text-lg text-[#102a43]">Update Deal Status</h3>
+                    <p className="text-xs text-slate-500">{dealModalLead.name} • {dealModalLead.productName || 'General Enquiry'}</p>
+                  </div>
+                  <button onClick={() => setDealModalLead(null)} className="rounded-full p-1 text-slate-400 hover:bg-slate-100">
+                    <X className="size-5" />
+                  </button>
+                </div>
+
+                <form onSubmit={saveDealStatus} className="mt-4 grid gap-4 text-sm">
+                  <div>
+                    <p className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-2">Deal Finalized Status *</p>
+                    <div className="grid gap-2">
+                      <label className={`flex items-center gap-3 rounded-xl border p-3 cursor-pointer transition ${dealStatus === 'Finalized' ? 'border-emerald-500 bg-emerald-50' : 'border-slate-200'}`}>
+                        <input
+                          type="radio"
+                          name="statusOption"
+                          checked={dealStatus === 'Finalized'}
+                          onChange={() => setDealStatus('Finalized')}
+                          className="accent-emerald-600 size-4"
+                        />
+                        <div>
+                          <p className="font-bold text-emerald-800">🟢 Deal Finalized (Closed-Won)</p>
+                          <p className="text-xs text-emerald-600">Client purchased equipment / contract closed.</p>
+                        </div>
+                      </label>
+
+                      <label className={`flex items-center gap-3 rounded-xl border p-3 cursor-pointer transition ${dealStatus === 'Not Finalized' ? 'border-red-500 bg-red-50' : 'border-slate-200'}`}>
+                        <input
+                          type="radio"
+                          name="statusOption"
+                          checked={dealStatus === 'Not Finalized'}
+                          onChange={() => setDealStatus('Not Finalized')}
+                          className="accent-red-600 size-4"
+                        />
+                        <div>
+                          <p className="font-bold text-red-800">🔴 Deal Not Finalized (Lost / Rejected)</p>
+                          <p className="text-xs text-red-600">Client did not purchase or selected alternative.</p>
+                        </div>
+                      </label>
+
+                      <label className={`flex items-center gap-3 rounded-xl border p-3 cursor-pointer transition ${dealStatus === 'Pending' ? 'border-amber-500 bg-amber-50' : 'border-slate-200'}`}>
+                        <input
+                          type="radio"
+                          name="statusOption"
+                          checked={dealStatus === 'Pending'}
+                          onChange={() => setDealStatus('Pending')}
+                          className="accent-amber-600 size-4"
+                        />
+                        <div>
+                          <p className="font-bold text-amber-800">🟡 Pending / In Negotiation</p>
+                          <p className="text-xs text-amber-600">Follow-up in progress.</p>
+                        </div>
+                      </label>
+                    </div>
+                  </div>
+
+                  {dealStatus === 'Finalized' && (
+                    <label className="grid gap-1 text-xs font-bold text-slate-700 bg-emerald-50/50 p-3 rounded-xl border border-emerald-200">
+                      Final Deal Amount (₹) *
+                      <input
+                        required
+                        type="text"
+                        placeholder="e.g. ₹ 2,50,000"
+                        value={dealAmount}
+                        onChange={(e) => setDealAmount(e.target.value)}
+                        className="rounded-xl border border-slate-300 bg-white p-2.5 text-sm font-semibold outline-none focus:border-emerald-500"
+                      />
+                    </label>
+                  )}
+
+                  {dealStatus === 'Not Finalized' && (
+                    <label className="grid gap-1 text-xs font-bold text-slate-700 bg-red-50/50 p-3 rounded-xl border border-red-200">
+                      Reason for Not Finalizing *
+                      <select
+                        value={dealReason}
+                        onChange={(e) => setDealReason(e.target.value)}
+                        className="rounded-xl border border-slate-300 bg-white p-2.5 text-sm font-medium outline-none focus:border-red-500"
+                      >
+                        <option value="">Select reason</option>
+                        <option value="Price too high">Price too high / Budget issue</option>
+                        <option value="Competitor selected">Competitor selected</option>
+                        <option value="Project / Budget postponed">Project / Budget postponed</option>
+                        <option value="Specifications mismatch">Specifications mismatch</option>
+                        <option value="Client stopped responding">Client stopped responding</option>
+                        <option value="Other">Other / Custom reason</option>
+                      </select>
+
+                      <input
+                        type="text"
+                        placeholder="Or enter custom reason..."
+                        value={dealReason}
+                        onChange={(e) => setDealReason(e.target.value)}
+                        className="mt-2 rounded-xl border border-slate-300 bg-white p-2.5 text-sm outline-none focus:border-red-500"
+                      />
+                    </label>
+                  )}
+
+                  <div className="flex gap-2 pt-2">
+                    <button
+                      type="button"
+                      onClick={() => setDealModalLead(null)}
+                      className="flex-1 rounded-full border border-slate-200 py-3 font-semibold text-slate-600 hover:bg-slate-50"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      disabled={updatingDeal}
+                      className="flex-1 rounded-full bg-[#f36f2b] py-3 font-bold text-white transition hover:bg-[#dd5b1d] disabled:opacity-60"
+                    >
+                      {updatingDeal ? 'Saving...' : 'Save Deal Status'}
+                    </button>
+                  </div>
+                </form>
               </div>
             </div>
           )}
