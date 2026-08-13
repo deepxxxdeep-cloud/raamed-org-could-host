@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useMemo, useState } from 'react'
-import { AlertTriangle, Building2, Database, Edit3, ExternalLink, HardDrive, ImagePlus, MapPin, Menu, Phone, PlusCircle, Printer, Trash2, X } from 'lucide-react'
+import { AlertTriangle, Building2, Database, Edit3, ExternalLink, FileSpreadsheet, HardDrive, ImagePlus, MapPin, Menu, Phone, PlusCircle, Printer, Trash2, X } from 'lucide-react'
 
 type Product = {
   _id?: string
@@ -213,6 +213,55 @@ export default function AdminPage() {
     }
   }
 
+  function exportLeadsToCSV() {
+    if (!leads || !leads.length) {
+      alert('No leads available to export.')
+      return
+    }
+
+    const headers = [
+      'S.No',
+      'Date',
+      'Product Name',
+      'Client Name',
+      'Organization',
+      'Phone',
+      'Email',
+      'Address',
+      'Requirement Details',
+      'Deal Status',
+      'Final Deal Amount',
+      'Rejection Reason',
+      'Printed Status',
+    ]
+
+    const rows = leads.map((l, index) => [
+      index + 1,
+      l.createdAt ? new Date(l.createdAt).toLocaleDateString() : 'N/A',
+      `"${(l.productName || 'General Enquiry').replace(/"/g, '""')}"`,
+      `"${(l.name || 'Unnamed').replace(/"/g, '""')}"`,
+      `"${(l.organization || '').replace(/"/g, '""')}"`,
+      `"${(l.phone || '').replace(/"/g, '""')}"`,
+      `"${(l.email || '').replace(/"/g, '""')}"`,
+      `"${(l.address || '').replace(/"/g, '""')}"`,
+      `"${(l.message || '').replace(/"/g, '""')}"`,
+      `"${(l.status || 'Pending').replace(/"/g, '""')}"`,
+      `"${(l.finalAmount || '').replace(/"/g, '""')}"`,
+      `"${(l.reason || '').replace(/"/g, '""')}"`,
+      l.isPrinted ? 'Printed' : 'Not Printed',
+    ])
+
+    const csvContent = [headers.join(','), ...rows.map((r) => r.join(','))].join('\n')
+    const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' })
+    const url = URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.setAttribute('href', url)
+    link.setAttribute('download', `Raamed_Leads_Report_${new Date().toISOString().split('T')[0]}.csv`)
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+  }
+
   async function saveOffice(e: React.FormEvent) {
     e.preventDefault()
     if (!officeForm.city || !officeForm.address) {
@@ -417,8 +466,57 @@ export default function AdminPage() {
 
   return (
     <main className="min-h-screen bg-[#f6f9fa] text-[#102a43]">
+      {/* Global Print Styles */}
+      <style jsx global>{`
+        @media print {
+          body, main, section {
+            background: white !important;
+            color: black !important;
+            padding: 0 !important;
+            margin: 0 !important;
+          }
+          aside, header, nav, .no-print, button, form, .storage-banner, .action-column {
+            display: none !important;
+          }
+          section {
+            padding-left: 0 !important;
+          }
+          .print-header {
+            display: block !important;
+          }
+          .print-container {
+            border: none !important;
+            box-shadow: none !important;
+            padding: 0 !important;
+          }
+          table {
+            width: 100% !important;
+            border-collapse: collapse !important;
+            font-size: 11px !important;
+          }
+          th, td {
+            border: 1px solid #cbd5e1 !important;
+            padding: 8px !important;
+          }
+        }
+      `}</style>
+
+      {/* Official Print Header (Visible only on print/PDF output) */}
+      <div className="hidden print-header p-4 mb-4">
+        <div className="flex items-center justify-between border-b-2 border-[#102a43] pb-3">
+          <div>
+            <h1 className="text-2xl font-bold tracking-tight text-[#102a43]">RAAMED HEALTHCARE EQUIPMENT</h1>
+            <p className="text-xs font-semibold text-slate-600">Official Client Lead Enquiries & Deal Status Report</p>
+          </div>
+          <div className="text-right text-xs text-slate-600">
+            <p className="font-bold">Date: {new Date().toLocaleDateString()}</p>
+            <p>Total Leads: {leads.length}</p>
+          </div>
+        </div>
+      </div>
+
       {/* Desktop Sidebar */}
-      <aside className="fixed inset-y-0 left-0 hidden w-72 border-r border-[#dce8eb] bg-white p-6 lg:block z-30">
+      <aside className="fixed inset-y-0 left-0 hidden w-72 border-r border-[#dce8eb] bg-white p-6 lg:block z-30 no-print">
         <a href="/" className="text-xl font-bold">
           Raamed
           <span className="block text-xs font-normal text-[#6f8793]">Admin workspace</span>
@@ -494,7 +592,7 @@ export default function AdminPage() {
 
       <section className="lg:pl-72">
         {/* Header with Mobile Menu Button */}
-        <header className="border-b border-[#dce8eb] bg-white px-5 py-4 flex items-center justify-between lg:px-8">
+        <header className="border-b border-[#dce8eb] bg-white px-5 py-4 flex items-center justify-between lg:px-8 no-print">
           <div>
             <p className="text-xs font-semibold uppercase tracking-wider text-[#6f8793]">Raamed operations</p>
             <h1 className="text-2xl font-semibold mt-0.5">{active}</h1>
@@ -519,7 +617,7 @@ export default function AdminPage() {
 
           {/* Storage Warning Banner when storage > 480MB or threshold met */}
           {storageStats?.mongo.isWarning && (
-            <div className="mb-6 rounded-2xl border border-amber-300 bg-amber-50 p-4 sm:p-5 shadow-sm text-[#102a43]">
+            <div className="mb-6 rounded-2xl border border-amber-300 bg-amber-50 p-4 sm:p-5 shadow-sm text-[#102a43] no-print">
               <div className="flex items-start justify-between gap-3">
                 <div className="flex items-start gap-3">
                   <AlertTriangle className="size-6 text-amber-600 shrink-0 mt-0.5" />
@@ -576,7 +674,7 @@ export default function AdminPage() {
           )}
 
           {/* Storage & Database Analytics Gauge Cards */}
-          <div className="mb-6 grid gap-4 md:grid-cols-2">
+          <div className="mb-6 grid gap-4 md:grid-cols-2 no-print">
             {/* MongoDB Storage Gauge */}
             <div className="rounded-2xl border border-[#dce8eb] bg-white p-5 shadow-sm">
               <div className="flex items-center justify-between">
@@ -1047,13 +1145,21 @@ export default function AdminPage() {
                   <p className="text-xs text-[#6f8793] mt-0.5">Track deal statuses, final amounts, rejection reasons, and manage storage auto-purge.</p>
                 </div>
 
-                <div className="flex flex-wrap items-center gap-2">
+                <div className="flex flex-wrap items-center gap-2 no-print">
                   <button
                     type="button"
                     onClick={markAllLeadsPrinted}
                     className="flex items-center gap-1.5 rounded-xl bg-slate-900 px-3.5 py-2 text-xs font-bold text-white shadow-sm hover:bg-slate-800 transition"
                   >
-                    <Printer className="size-3.5 text-amber-400" /> Print & Mark All Printed
+                    <Printer className="size-3.5 text-amber-400" /> Print PDF / Paper Report
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={exportLeadsToCSV}
+                    className="flex items-center gap-1.5 rounded-xl bg-emerald-700 px-3.5 py-2 text-xs font-bold text-white shadow-sm hover:bg-emerald-800 transition"
+                  >
+                    <FileSpreadsheet className="size-3.5 text-white" /> Export to Excel (.xlsx / .csv)
                   </button>
 
                   <button
@@ -1074,7 +1180,7 @@ export default function AdminPage() {
                 </div>
               </div>
 
-              <div className="mt-5 overflow-x-auto">
+              <div className="mt-5 overflow-x-auto print-container">
                 <table className="w-full text-left text-sm border-collapse">
                   <thead>
                     <tr className="border-b border-slate-200 bg-slate-50 text-xs font-bold uppercase tracking-wider text-[#6f8793]">
@@ -1082,7 +1188,7 @@ export default function AdminPage() {
                       <th className="p-3.5">Client & Contact</th>
                       <th className="p-3.5">Requirement Details</th>
                       <th className="p-3.5">Deal Status</th>
-                      <th className="p-3.5 text-right">Action</th>
+                      <th className="p-3.5 text-right action-column no-print">Action</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-100">
@@ -1158,7 +1264,7 @@ export default function AdminPage() {
                           )}
                         </td>
 
-                        <td className="p-3.5 align-top text-right">
+                        <td className="p-3.5 align-top text-right action-column no-print">
                           <button
                             type="button"
                             onClick={() => openDealModal(l)}
