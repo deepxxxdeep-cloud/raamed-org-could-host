@@ -1,33 +1,7 @@
 import { NextResponse } from 'next/server'
 import { createQuote } from '@/lib/mongodb'
 
-export const memoryQuotes: Record<string, unknown>[] = [
-  {
-    _id: 'sample-1',
-    name: 'Dr. Meera Kulkarni',
-    email: 'meera@asterline.com',
-    phone: '+91 98765 43210',
-    organization: 'Asterline Hospital',
-    address: 'Mumbai, Maharashtra',
-    productName: 'Patient Monitor THR-2026',
-    message: 'Required 5 patient monitors with central station support.',
-    createdAt: new Date().toISOString(),
-    status: 'Finalized',
-    finalAmount: '₹ 4,50,000',
-  },
-  {
-    _id: 'sample-2',
-    name: 'Dr. Arjun Malhotra',
-    email: 'arjun@northviewclinic.org',
-    phone: '+91 98123 45678',
-    organization: 'Northview Clinic',
-    address: 'Delhi NCR',
-    productName: 'Surgical ICU Monitor',
-    message: 'Inquiring about warranty and demo setup.',
-    createdAt: new Date().toISOString(),
-    status: 'Pending',
-  },
-]
+export const memoryQuotes: Record<string, unknown>[] = []
 
 export async function POST(request: Request) {
   try {
