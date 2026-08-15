@@ -6,6 +6,7 @@ import { ArrowRight, CheckCircle2, MessageCircle, Phone, ShieldCheck } from 'luc
 import { MedicalHero } from '@/components/medical-hero'
 import { MediaCard, SiteFooter, SiteHeader } from '@/components/site-shell'
 import { QuoteDialog } from '@/components/quote-dialog'
+import { FestivalHomepageVideo } from '@/components/festival-decorations'
 
 import { useLanguage } from '@/lib/language-context'
 
@@ -41,7 +42,9 @@ export default function Page() {
   return (
     <main className="min-h-screen bg-[#f7fafb] text-[#102a43]">
       <SiteHeader onQuote={() => setQuoteOpen(true)} />
-      
+
+      <FestivalHomepageVideo />
+
       <section className="mx-auto grid max-w-7xl gap-10 px-5 pb-20 pt-14 lg:grid-cols-[.9fr_1.1fr] lg:items-center lg:px-8 lg:pt-20">
         <div>
           <p className="flex items-center gap-2 text-sm font-bold uppercase tracking-[.18em] text-[#f36f2b]">

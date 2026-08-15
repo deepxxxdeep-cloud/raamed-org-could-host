@@ -145,6 +145,7 @@ const jsonLd = {
 }
 
 import { LanguageProvider } from '@/lib/language-context'
+import { FestivalDecorations } from '@/components/festival-decorations'
 
 export default function RootLayout({
   children,
@@ -161,6 +162,7 @@ export default function RootLayout({
       </head>
       <body className="antialiased">
         <LanguageProvider>
+          <FestivalDecorations />
           {children}
         </LanguageProvider>
         {process.env.NODE_ENV === 'production' && <Analytics />}

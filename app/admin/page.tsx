@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react'
 import { AlertTriangle, Building2, Database, Edit3, ExternalLink, FileSpreadsheet, HardDrive, ImagePlus, MapPin, Menu, Phone, PlusCircle, Printer, Trash2, X } from 'lucide-react'
+import { FestivalModeAdmin } from '@/components/festival-mode-admin'
 
 type Product = {
   _id?: string
@@ -115,7 +116,7 @@ export default function AdminPage() {
   const [uploading, setUploading] = useState(false)
   const [newCategory, setNewCategory] = useState(false)
 
-  const nav = ['Overview', 'Products', 'Regional Offices', 'Leads & enquiries', 'Analytics', 'Settings']
+  const nav = ['Overview', 'Products', 'Regional Offices', 'Leads & enquiries', 'Analytics', 'Festival Mode', 'Settings']
 
   const loadOffices = async () => {
     try {
@@ -1467,6 +1468,8 @@ export default function AdminPage() {
               </div>
             </div>
           )}
+
+          {active === 'Festival Mode' && <FestivalModeAdmin />}
 
           {active === 'Settings' && (
             <div className="max-w-2xl rounded-2xl border border-[#dce8eb] bg-white p-6">
