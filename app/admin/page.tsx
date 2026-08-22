@@ -3,6 +3,8 @@
 import { useEffect, useMemo, useState } from 'react'
 import { AlertTriangle, Building2, Database, Edit3, ExternalLink, FileSpreadsheet, HardDrive, ImagePlus, MapPin, Menu, Phone, PlusCircle, Printer, Trash2, X } from 'lucide-react'
 import { FestivalModeAdmin } from '@/components/festival-mode-admin'
+import { ProductMediaAdmin } from '@/components/product-media-admin'
+import { RammedGalleryAdmin } from '@/components/rammed-gallery-admin'
 
 type Product = {
   _id?: string
@@ -116,7 +118,7 @@ export default function AdminPage() {
   const [uploading, setUploading] = useState(false)
   const [newCategory, setNewCategory] = useState(false)
 
-  const nav = ['Overview', 'Products', 'Regional Offices', 'Leads & enquiries', 'Analytics', 'Festival Mode', 'Settings']
+  const nav = ['Overview', 'Products', 'Product Media', 'Rammed Gallery', 'Regional Offices', 'Leads & enquiries', 'Analytics', 'Festival Mode', 'Settings']
 
   const loadOffices = async () => {
     try {
@@ -1468,6 +1470,10 @@ export default function AdminPage() {
               </div>
             </div>
           )}
+
+          {active === 'Product Media' && <ProductMediaAdmin />}
+
+          {active === 'Rammed Gallery' && <RammedGalleryAdmin />}
 
           {active === 'Festival Mode' && <FestivalModeAdmin />}
 

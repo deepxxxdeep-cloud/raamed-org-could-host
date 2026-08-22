@@ -7,6 +7,7 @@ import { MedicalHero } from '@/components/medical-hero'
 import { MediaCard, SiteFooter, SiteHeader } from '@/components/site-shell'
 import { QuoteDialog } from '@/components/quote-dialog'
 import { FestivalHomepageVideo } from '@/components/festival-decorations'
+import { ProductVideoMarquee } from '@/components/product-video-marquee'
 
 import { useLanguage } from '@/lib/language-context'
 
@@ -79,6 +80,8 @@ export default function Page() {
           <div><p className="text-3xl font-semibold text-[#102a43]">24h</p><p className="mt-1 text-sm text-slate-500">{t('responseWindowText')}</p></div>
         </div>
       </section>
+
+      <ProductVideoMarquee />
 
       <section id="products" className="mx-auto max-w-7xl px-5 py-20 lg:px-8">
         <div className="flex flex-wrap items-end justify-between gap-5">
